@@ -1,10 +1,9 @@
 from django.db import models
 from .constants.models import *
-#TODO: revisar el delete en cascada
 # Create your models here.
 
 
-# Fijarse que aqui se puede usar el mismo del auth
+# TODO: Fijarse que aqui se puede usar el mismo del auth
 class User(models.Model):
     """Model definition for User."""
 
@@ -18,7 +17,7 @@ class User(models.Model):
 
     def __str__(self):
         """Unicode representation of User."""
-        pass
+        return self.name
 
 
 class Source(models.Model):
@@ -43,7 +42,7 @@ class Client(models.Model):
     address = models.CharField(max_length=200)
     municipality = models.CharField(max_length=20)
     source = models.ForeignKey(Source, on_delete=models.CASCADE)
-    comment = models.TextField()
+    comment = models.TextField(blank=True)
 
     class Meta:
         """Meta definition for Client."""
@@ -60,7 +59,7 @@ class Hardware(models.Model):
     brand = models.CharField(max_length=50, blank=False, null=False)
     model = models.CharField(max_length=50)
     type = models.CharField(max_length=50, blank=False, null=False)
-    serial_number = models.CharField(max_length=50)
+    serial_number = models.CharField(max_length=50, blank=True)
 
     class Meta:
         """Meta definition for Hardware."""
@@ -77,7 +76,7 @@ class Entry(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20) 
-    entry_conditions = models.TextField()
+    entry_conditions = models.TextField(blank=True)
     hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE) 
     datetime = models.DateTimeField(auto_now_add=True,auto_now=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -99,9 +98,9 @@ class Service(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_WORKSHOP, default= UNASSIGNED_PENDING)
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
-    staff_annotations = models.TextField()
+    staff_annotations = models.TextField(blank=True)
     date = models.DateField(auto_now=False, auto_now_add=True)
-    fix = models.ForeignKey('Fix', on_delete=models.CASCADE)
+    fix = models.ForeignKey('Fix', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         """Meta definition for Service."""
@@ -121,7 +120,6 @@ class Piece(models.Model):
     price = models.FloatField(blank=False, null=False)
     count = models.IntegerField(default=0, blank=False, null= False)
     min_count = models.IntegerField(default=0, blank= True, null= True)
-    fix = models.ForeignKey('Fix', null=True, blank=True, on_delete=models.CASCADE)
 
 
     class Meta:
@@ -146,8 +144,7 @@ class OtherPiece(models.Model):
     """Model definition for OtherPiece."""
 
     name = models.CharField(max_length=20, blank=False, null=False)
-    price = models.FileField(blank=False, null=False, default = 0)
-    fix = models.ForeignKey('Fix', null=True, blank=True, on_delete=models.CASCADE)
+    price = models.FloatField(blank=False, null=False)
 
     class Meta:
         """Meta definition for OtherPiece."""
@@ -160,11 +157,13 @@ class OtherPiece(models.Model):
         return "%s -> %s"%(self.name, self.price)
 
 
-# TODO: Agregar metodos o formas faciles de resolver todos sus campos (precio final)
+
 class Fix(models.Model):
     """Model definition for Fix."""
 
     base_price = models.FloatField()
+    pices = models.ManyToManyField(Piece, blank=True)
+    other_pices = models.ManyToManyField(OtherPiece,blank=True)
 
     class Meta:
         """Meta definition for Fix."""
@@ -174,19 +173,31 @@ class Fix(models.Model):
 
     def __str__(self):
         """Unicode representation of Fix."""
-        pass
+        return 'Total price = %s'%(self.total_price())
 
+    def pieces_price(self):
+        price = self.pices.all().aggregate(models.Sum('price'))['price__sum']
+        return price if price else 0
+
+    def other_pices_price(self):
+        price = self.other_pices.all().aggregate(models.Sum('price'))['price__sum']         
+        return price if price else 0
+    
+    def total_price(self):
+        return self.base_price + self.pieces_price() + self.other_pices_price()
 
 class RoadEntry(models.Model):
     """Model definition for RoadEntry."""
 
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()
     phone_number = models.CharField(max_length=20) 
     hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE) 
-    customer_observation = models.TextField()
-    appointment_datetime = models.DateTimeField(auto_now=False, auto_now_add=False)
-    fixed_appointment_datetime = models.DateTimeField(auto_now=False, auto_now_add=False)
+    customer_observation = models.TextField(blank=True)
+    appointment_datetime = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    fixed_appointment_datetime = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    
 
     class Meta:
         """Meta definition for RoadEntry."""
@@ -199,6 +210,27 @@ class RoadEntry(models.Model):
         return "%s has problem with %s added by %s"%(self.client, self.hardware, self.user)
         
 
+class SubRoadService(models.Model):
+    """Model definition for SubRoadService."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    state = models.CharField(max_length=10, choices=STATE_CHOICES_ROAD, default=REQUESTED)
+    hardware = models.ForeignKey(Hardware, null=False, blank=False, on_delete=models.CASCADE)
+    staff_annotations =  models.TextField(blank= True)
+    fix = models.ForeignKey(Fix, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now=False, auto_now_add=True)
+    # entry = models.ForeignKey(RoadEntry, on_delete=models.CASCADE)
+
+
+    class Meta:
+        """Meta definition for SubRoadService."""
+
+        verbose_name = 'SubRoadService'
+        verbose_name_plural = 'SubRoadServices'
+
+    def __str__(self):
+        """Unicode representation of SubRoadService."""
+        return "%s %s"%(self.state, self.hardware)
 
 
 class RoadService(models.Model):
@@ -206,10 +238,11 @@ class RoadService(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_ROAD, default=REQUESTED)
-    hardware = models.ForeignKey(Hardware, null=False, blank=False, on_delete=models.CASCADE)
-    staff_annotations =  models.TextField()
+    # hardware = models.ForeignKey(Hardware, null=False, blank=False, on_delete=models.CASCADE)
+    staff_annotations =  models.TextField(blank= True)
     fix = models.ForeignKey(Fix, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now=False, auto_now_add=True)
+    others_services = models.ManyToManyField(SubRoadService, blank=True)
     entry = models.ForeignKey(RoadEntry, on_delete=models.CASCADE)
 
     class Meta:
