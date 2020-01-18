@@ -75,7 +75,6 @@ class Entry(models.Model):
         """Unicode representation of Entry."""
         return "%s have %s added by %s"%(self.client, self.hardware, self.user)
 
-
 class Service(models.Model):
     """Model definition for Service."""
 
@@ -123,7 +122,6 @@ class Piece(models.Model):
         # TODO Cambiar este numero, permitir poner uno dinamico
         return self.min_count < self.min_count if self.min_count else self.count <= 30
 
-
 class OtherPiece(models.Model):
     """Model definition for OtherPiece."""
 
@@ -139,8 +137,6 @@ class OtherPiece(models.Model):
     def __str__(self):
         """Unicode representation of OtherPiece."""
         return "%s -> %s"%(self.name, self.price)
-
-
 
 class Fix(models.Model):
     """Model definition for Fix."""
@@ -193,7 +189,6 @@ class RoadEntry(models.Model):
         """Unicode representation of RoadEntry."""
         return "%s has problem with %s added by %s"%(self.client, self.hardware, self.user)
         
-
 class SubRoadService(models.Model):
     """Model definition for SubRoadService."""
 
@@ -216,7 +211,6 @@ class SubRoadService(models.Model):
         """Unicode representation of SubRoadService."""
         return "%s %s"%(self.state, self.hardware)
 
-
 class RoadService(models.Model):
     """Model definition for RoadService."""
 
@@ -238,7 +232,6 @@ class RoadService(models.Model):
     def __str__(self):
         """Unicode representation of RoadService."""
         return "%s %s"%(self.state, self.entry)
-
 
 class Log(models.Model):
     """Model definition for Log."""
