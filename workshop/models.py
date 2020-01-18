@@ -1,23 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 from .constants.models import *
 # Create your models here.
-
-
-# TODO: Fijarse que aqui se puede usar el mismo del auth
-class User(models.Model):
-    """Model definition for User."""
-
-    name = models.CharField(max_length=100, blank=False, null=False)
-
-    class Meta:
-        """Meta definition for User."""
-
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-
-    def __str__(self):
-        """Unicode representation of User."""
-        return self.name
 
 
 class Source(models.Model):
@@ -254,4 +238,22 @@ class RoadService(models.Model):
     def __str__(self):
         """Unicode representation of RoadService."""
         return "%s %s"%(self.state, self.entry)
+
+
+class Log(models.Model):
+    """Model definition for Log."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    log = models.CharField(max_length=200)
+    datetime = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    class Meta:
+        """Meta definition for Log."""
+
+        verbose_name = 'Log'
+        verbose_name_plural = 'Logs'
+
+    def __str__(self):
+        """Unicode representation of Log."""
+        return "%s -> %s"%(self.user, self.log)
 
