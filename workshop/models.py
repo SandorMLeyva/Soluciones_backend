@@ -78,7 +78,7 @@ class Entry(models.Model):
 class Service(models.Model):
     """Model definition for Service."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_WORKSHOP, default= UNASSIGNED_PENDING)
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     staff_annotations = models.TextField(blank=True)
