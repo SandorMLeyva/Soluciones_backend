@@ -71,7 +71,7 @@ class Query(object):
     def resolve_sources(self, info, **kwargs):
         return Source.objects.all()
     def resolve_clients(self, info, **kwargs):
-        return client.objects.all()
+        return Client.objects.all()
     def resolve_hardwares(self, info, **kwargs):
         return Hardware.objects.all()
     def resolve_entries(self, info, **kwargs):
