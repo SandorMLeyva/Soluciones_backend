@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from workshop.models import Source, Client, Hardware, Entry, Service, Piece, OtherPiece, Fix, RoadEntry, SubRoadService, RoadService, Log
+from workshop.models import *
 
 
 # Types
@@ -51,7 +51,6 @@ class RoadServiceType(DjangoObjectType):
 class LogType(DjangoObjectType):
     class Meta:
         model = Log
-from workshop.models import Source, Client, Hardware, Entry, Service, Piece, OtherPiece, Fix, RoadEntry, SubRoadService, RoadService, Log
 
 # Query
 class Query(object):
@@ -71,7 +70,7 @@ class Query(object):
     def resolve_sources(self, info, **kwargs):
         return Source.objects.all()
     def resolve_clients(self, info, **kwargs):
-        return client.objects.all()
+        return Client.objects.all()
     def resolve_hardwares(self, info, **kwargs):
         return Hardware.objects.all()
     def resolve_entries(self, info, **kwargs):
