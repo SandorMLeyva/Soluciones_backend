@@ -78,7 +78,7 @@ class Entry(models.Model):
 class Service(models.Model):
     """Model definition for Service."""
 
-    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_WORKSHOP, default= UNASSIGNED_PENDING)
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     staff_annotations = models.TextField(blank=True)
@@ -215,11 +215,11 @@ class SubRoadService(models.Model):
 class RoadService(models.Model):
     """Model definition for RoadService."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_ROAD, default=REQUESTED)
     # hardware = models.ForeignKey(Hardware, null=False, blank=False, on_delete=models.CASCADE)
     staff_annotations =  models.TextField(blank= True)
-    fix = models.ForeignKey(Fix, on_delete=models.CASCADE)
+    fix = models.ForeignKey(Fix, null=True, blank=True, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now=False, auto_now_add=True)
     others_services = models.ManyToManyField(SubRoadService, blank=True)
     entry = models.ForeignKey(RoadEntry, on_delete=models.CASCADE)
