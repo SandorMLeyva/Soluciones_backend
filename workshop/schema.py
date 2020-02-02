@@ -124,7 +124,6 @@ class Query(graphene.ObjectType):
 class CreateEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         client_id = graphene.String()
         phone_number = graphene.String()
         entry_conditions = graphene.String()
@@ -135,8 +134,8 @@ class CreateEntry(Mutation):
     ok = graphene.Boolean()
     entry = graphene.Field(lambda: EntryType)
 
-    def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
-        entry = Entry.objects.get(pk=id)
+    def mutate(self, info, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
+        entry = Entry()
         entry.client = Client.objects.get(pk=client_id)
         entry.phone_number = phone_number
         entry.entry_conditions = entry_conditions
@@ -150,7 +149,6 @@ class CreateEntry(Mutation):
 class CreateRoadEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         client_id = graphene.String()
         user_id = graphene.String()
         address = graphene.String()
@@ -163,8 +161,8 @@ class CreateRoadEntry(Mutation):
     ok = graphene.Boolean()
     roadentry = graphene.Field(lambda: RoadEntryType)
 
-    def mutate(self, info, id, client_id, user_id, address, phone_number, hardware_id, customer_observation, appointment_datetime, fixed_appointment_datetime):
-        roadentry = RoadEntry.objects.get(pk=id)
+    def mutate(self, info, client_id, user_id, address, phone_number, hardware_id, customer_observation, appointment_datetime, fixed_appointment_datetime):
+        roadentry = RoadEntry()
         roadentry.client = Client.objects.get(pk=client_id)
         roadentry.user = User.objects.get(pk=user_id)
         roadentry.address = address
@@ -180,7 +178,6 @@ class CreateRoadEntry(Mutation):
 class CreateClient(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         name = graphene.String()
         phone_number = graphene.String()
         address = graphene.String()
@@ -191,8 +188,8 @@ class CreateClient(Mutation):
     ok = graphene.Boolean()
     client = graphene.Field(lambda: ClientType)
 
-    def mutate(self, info, id, name, phone_number, address, municipality, source_id, comment):
-        client = Client.objects.get(pk=id)
+    def mutate(self, info, name, phone_number, address, municipality, source_id, comment):
+        client = Client()
         client.name = name
         client.phone_number = phone_number
         client.address = address
@@ -207,7 +204,6 @@ class CreateClient(Mutation):
 class CreateHardware(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         brand = graphene.String()
         model = graphene.String()
         type = graphene.String()
@@ -216,8 +212,8 @@ class CreateHardware(Mutation):
     ok = graphene.Boolean()
     hardware = graphene.Field(lambda: HardwareType)
 
-    def mutate(self, info, id, brand, model, type, serial_number):
-        hardware = Hardware.objects.get(pk=id)
+    def mutate(self, info, brand, model, type, serial_number):
+        hardware = Hardware()
         hardware.brand = brand
         hardware.model = model
         hardware.type = type
@@ -229,15 +225,14 @@ class CreateHardware(Mutation):
 class CreateOtherPiece(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         name = graphene.String()
         price = graphene.Float()
 
     ok = graphene.Boolean()
     other_piece = graphene.Field(lambda: OtherPieceType)
 
-    def mutate(self, info, id, name, price):
-        other_piece = OtherPiece.objects.get(pk=id)
+    def mutate(self, info, name, price):
+        other_piece = OtherPiece()
         other_piece.name = name
         other_piece.price = price
 
@@ -247,7 +242,6 @@ class CreateOtherPiece(Mutation):
 class CreateFix(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         base_price = graphene.Float()
         pieces = graphene.List(graphene.String)
         other_pieces = graphene.List(graphene.String)
@@ -255,8 +249,8 @@ class CreateFix(Mutation):
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
 
-    def mutate(self, info, id, base_price, pieces, other_pieces):
-        fix = Fix.objects.get(pk=id)
+    def mutate(self, info, base_price, pieces, other_pieces):
+        fix = Fix()
         fix.base_price = base_price
 
         if pieces:
@@ -277,7 +271,6 @@ class CreateFix(Mutation):
 class CreateSubRoadService(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
         user_id = graphene.String()
         state = graphene.String()
         hardware_id = graphene.String()
@@ -288,8 +281,8 @@ class CreateSubRoadService(Mutation):
     ok = graphene.Boolean()
     subroadservice = graphene.Field(lambda: SubRoadServiceType)
 
-    def mutate(self, info, id, user_id, state, hardware_id, staff_annotations, fix_id, datetime):
-        subroadservice = SubRoadService.objects.get(pk=id)
+    def mutate(self, info, user_id, state, hardware_id, staff_annotations, fix_id, datetime):
+        subroadservice = SubRoadService()
         subroadservice.user = User.objects.get(pk=user_id)
         subroadservice.state = state
         subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
@@ -304,7 +297,7 @@ class CreateSubRoadService(Mutation):
 class UpdateEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         client_id = graphene.String()
         phone_number = graphene.String()
         entry_conditions = graphene.String()
@@ -330,7 +323,7 @@ class UpdateEntry(Mutation):
 class UpdateRoadEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         client_id = graphene.String()
         user_id = graphene.String()
         address = graphene.String()
@@ -360,7 +353,7 @@ class UpdateRoadEntry(Mutation):
 class UpdateClient(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         name = graphene.String()
         phone_number = graphene.String()
         address = graphene.String()
@@ -387,7 +380,7 @@ class UpdateClient(Mutation):
 class UpdateHardware(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         brand = graphene.String()
         model = graphene.String()
         type = graphene.String()
@@ -409,7 +402,7 @@ class UpdateHardware(Mutation):
 class UpdateOtherPiece(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         name = graphene.String()
         price = graphene.Float()
 
@@ -427,7 +420,7 @@ class UpdateOtherPiece(Mutation):
 class UpdateFix(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         base_price = graphene.Float()
         pieces = graphene.List(graphene.String)
         other_pieces = graphene.List(graphene.String)
@@ -457,7 +450,7 @@ class UpdateFix(Mutation):
 class UpdateSubRoadService(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
         user_id = graphene.String()
         state = graphene.String()
         hardware_id = graphene.String()
@@ -485,7 +478,7 @@ class UpdateSubRoadService(Mutation):
 class DeleteEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -496,7 +489,7 @@ class DeleteEntry(Mutation):
 class DeleteRoadEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -507,7 +500,7 @@ class DeleteRoadEntry(Mutation):
 class DeleteClient(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -518,7 +511,7 @@ class DeleteClient(Mutation):
 class DeleteHardware(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -529,7 +522,7 @@ class DeleteHardware(Mutation):
 class DeleteOtherPiece(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -540,7 +533,7 @@ class DeleteOtherPiece(Mutation):
 class DeleteFix(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
@@ -551,7 +544,7 @@ class DeleteFix(Mutation):
 class DeleteSubRoadService(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        id = graphene.String()
+        id = graphene.Int()
 
     ok = graphene.Boolean()
 
