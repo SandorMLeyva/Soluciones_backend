@@ -78,12 +78,13 @@ class Entry(models.Model):
 class Service(models.Model):
     """Model definition for Service."""
 
-    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_WORKSHOP, default= UNASSIGNED_PENDING)
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     staff_annotations = models.TextField(blank=True)
     date = models.DateField(auto_now=False, auto_now_add=True)
     fix = models.ForeignKey('Fix', on_delete=models.SET_NULL, blank=True, null=True)
+    seal_number = models.CharField(max_length=30)
 
     class Meta:
         """Meta definition for Service."""
@@ -117,7 +118,7 @@ class Piece(models.Model):
 
     def count_warn(self):
         """
-        Return True if number of pices is small
+        Return True if number of pieces is small
         """
         # TODO Cambiar este numero, permitir poner uno dinamico
         return self.min_count < self.min_count if self.min_count else self.count <= 30
@@ -142,8 +143,8 @@ class Fix(models.Model):
     """Model definition for Fix."""
 
     base_price = models.FloatField()
-    pices = models.ManyToManyField(Piece, blank=True)
-    other_pices = models.ManyToManyField(OtherPiece,blank=True)
+    pieces = models.ManyToManyField(Piece, blank=True)
+    other_pieces = models.ManyToManyField(OtherPiece,blank=True)
 
     class Meta:
         """Meta definition for Fix."""
@@ -156,15 +157,15 @@ class Fix(models.Model):
         return 'Total price = %s'%(self.total_price())
 
     def pieces_price(self):
-        price = self.pices.all().aggregate(models.Sum('price'))['price__sum']
+        price = self.pieces.all().aggregate(models.Sum('price'))['price__sum']
         return price if price else 0
 
-    def other_pices_price(self):
-        price = self.other_pices.all().aggregate(models.Sum('price'))['price__sum']         
+    def other_pieces_price(self):
+        price = self.other_pieces.all().aggregate(models.Sum('price'))['price__sum']         
         return price if price else 0
     
     def total_price(self):
-        return self.base_price + self.pieces_price() + self.other_pices_price()
+        return self.base_price + self.pieces_price() + self.other_pieces_price()
 
 class RoadEntry(models.Model):
     """Model definition for RoadEntry."""
@@ -214,11 +215,11 @@ class SubRoadService(models.Model):
 class RoadService(models.Model):
     """Model definition for RoadService."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     state = models.CharField(max_length=10, choices=STATE_CHOICES_ROAD, default=REQUESTED)
     # hardware = models.ForeignKey(Hardware, null=False, blank=False, on_delete=models.CASCADE)
     staff_annotations =  models.TextField(blank= True)
-    fix = models.ForeignKey(Fix, on_delete=models.CASCADE)
+    fix = models.ForeignKey(Fix, null=True, blank=True, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now=False, auto_now_add=True)
     others_services = models.ManyToManyField(SubRoadService, blank=True)
     entry = models.ForeignKey(RoadEntry, on_delete=models.CASCADE)
