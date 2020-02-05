@@ -1,4 +1,5 @@
 import graphene
+from graphene import Mutation, ObjectType
 from graphene_django import DjangoObjectType
 from workshop.models import *
 
@@ -53,7 +54,7 @@ class LogType(DjangoObjectType):
         model = Log
 
 # Query
-class Query(object):
+class Query(graphene.ObjectType):
     sources = graphene.List(SourceType)
     clients = graphene.List(ClientType)
     hardwares = graphene.List(HardwareType)
@@ -67,6 +68,15 @@ class Query(object):
     roadservices = graphene.List(RoadServiceType)
     logs = graphene.List(LogType)
 
+    entry = graphene.Field(EntryType, id=graphene.String())
+    roadentry = graphene.Field(RoadEntryType, id=graphene.String())
+    client = graphene.Field(ClientType, id=graphene.String())
+    hardware = graphene.Field(HardwareType, id=graphene.String())
+    otherpiece = graphene.Field(OtherPieceType, id=graphene.String())
+    fix = graphene.Field(FixType, id=graphene.String())
+    subroadfix = graphene.Field(SubRoadServiceType, id=graphene.String())
+
+    # Read ALL queries
     def resolve_sources(self, info, **kwargs):
         return Source.objects.all()
     def resolve_clients(self, info, **kwargs):
@@ -91,3 +101,19 @@ class Query(object):
         return RoadService.objects.all()
     def resolve_logs(self, info, **kwargs):
         return Log.objects.all()
+
+    # Read ONE Queries
+    def resolve_entry(self, info, id):
+        return Entry.objects.get(pk=id)
+    def resolve_roadentry(self, info, id):
+        return RoadEntry.objects.get(pk=id)
+    def resolve_client(self, info, id):
+        return Client.objects.get(pk=id)
+    def resolve_hardware(self, info, id):
+        return Hardware.objects.get(pk=id)
+    def resolve_otherpiece(self, info, id):
+        return OtherPiece.objects.get(pk=id)
+    def resolve_fix(self, info, id):
+        return Fix.objects.get(pk=id)
+    def resolve_subroadservice(self, info, id):
+        return SubRoadServiceType.objects.get(pk=id)
