@@ -117,3 +117,471 @@ class Query(graphene.ObjectType):
         return Fix.objects.get(pk=id)
     def resolve_subroadservice(self, info, id):
         return SubRoadServiceType.objects.get(pk=id)
+
+# Mutations
+
+### CREATE
+class CreateEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        client_id = graphene.String()
+        phone_number = graphene.String()
+        entry_conditions = graphene.String()
+        hardware_id = graphene.String()
+        datetime = graphene.String()
+        user_id = graphene.String()
+
+    ok = graphene.Boolean()
+    entry = graphene.Field(lambda: EntryType)
+
+    def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
+        entry = Entry.objects.get(pk=id)
+        entry.client = Client.objects.get(pk=client_id)
+        entry.phone_number = phone_number
+        entry.entry_conditions = entry_conditions
+        entry.hardware = Hardware.objects.get(pk=hardware_id)
+        entry.datetime = datetime
+        entry.user = User.objects.get(pk=client_id)
+
+        entry.save()
+        return CreateEntry(entry=entry, ok=True)
+
+class CreateRoadEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        client_id = graphene.String()
+        user_id = graphene.String()
+        address = graphene.String()
+        phone_number = graphene.String()
+        hardware_id = graphene.String()
+        customer_observation = graphene.String()
+        appointment_datetime = graphene.String()
+        fixed_appointment_datetime = graphene.String()
+
+    ok = graphene.Boolean()
+    roadentry = graphene.Field(lambda: RoadEntryType)
+
+    def mutate(self, info, id, client_id, user_id, address, phone_number, hardware_id, customer_observation, appointment_datetime, fixed_appointment_datetime):
+        roadentry = RoadEntry.objects.get(pk=id)
+        roadentry.client = Client.objects.get(pk=client_id)
+        roadentry.user = User.objects.get(pk=user_id)
+        roadentry.address = address
+        roadentry.phone_number = phone_number
+        roadentry.hardware = Hardware.objects.get(pk=hardware_id)
+        roadentry.customer_observation = customer_observation
+        roadentry.appointment_datetime = appointment_datetime
+        roadentry.fixed_appointment_datetime = fixed_appointment_datetime
+
+        roadentry.save()
+        return CreateRoadEntry(roadentry=roadentry, ok=True)
+
+class CreateClient(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        name = graphene.String()
+        phone_number = graphene.String()
+        address = graphene.String()
+        municipality = graphene.String()
+        source_id = graphene.String()
+        comment = graphene.String()
+
+    ok = graphene.Boolean()
+    client = graphene.Field(lambda: ClientType)
+
+    def mutate(self, info, id, name, phone_number, address, municipality, source_id, comment):
+        client = Client.objects.get(pk=id)
+        client.name = name
+        client.phone_number = phone_number
+        client.address = address
+        client.address = address 
+        client.municipality = municipality
+        client.source = Source.objects.get(pk=source_id)
+        client.comment = comment
+
+        client.save()
+        return CreateClient(client=client, ok=True)
+
+class CreateHardware(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        brand = graphene.String()
+        model = graphene.String()
+        type = graphene.String()
+        serial_number = graphene.String()
+
+    ok = graphene.Boolean()
+    hardware = graphene.Field(lambda: HardwareType)
+
+    def mutate(self, info, id, brand, model, type, serial_number):
+        hardware = Hardware.objects.get(pk=id)
+        hardware.brand = brand
+        hardware.model = model
+        hardware.type = type
+        hardware.serial_number = serial_number 
+
+        hardware.save()
+        return CreateHardware(hardware=hardware, ok=True)
+
+class CreateOtherPiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        name = graphene.String()
+        price = graphene.Float()
+
+    ok = graphene.Boolean()
+    other_piece = graphene.Field(lambda: OtherPieceType)
+
+    def mutate(self, info, id, name, price):
+        other_piece = OtherPiece.objects.get(pk=id)
+        other_piece.name = name
+        other_piece.price = price
+
+        other_piece.save()
+        return CreateOtherPiece(other_piece=other_piece, ok=True)
+
+class CreateFix(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        base_price = graphene.Float()
+        pieces = graphene.List(graphene.String)
+        other_pieces = graphene.List(graphene.String)
+
+    ok = graphene.Boolean()
+    fix = graphene.Field(lambda: FixType)
+
+    def mutate(self, info, id, base_price, pieces, other_pieces):
+        fix = Fix.objects.get(pk=id)
+        fix.base_price = base_price
+
+        if pieces:
+            fix.pieces.clear()
+            ps = [Piece.objects.get(pk=i) for i in pieces]
+            for piece in ps:
+               fix.pieces.add(piece)
+
+        if other_pieces:
+            fix.other_pieces.clear()
+            ps = [OtherPiece.objects.get(pk=i) for i in other_pieces]
+            for piece in ps:
+               fix.other_pieces.add(piece)
+
+        fix.save()
+        return CreateFix(fix=fix, ok=True)
+
+class CreateSubRoadService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        user_id = graphene.String()
+        state = graphene.String()
+        hardware_id = graphene.String()
+        staff_annotations = graphene.String()
+        fix_id = graphene.String()
+        datetime = graphene.String()
+
+    ok = graphene.Boolean()
+    subroadservice = graphene.Field(lambda: SubRoadServiceType)
+
+    def mutate(self, info, id, user_id, state, hardware_id, staff_annotations, fix_id, datetime):
+        subroadservice = SubRoadService.objects.get(pk=id)
+        subroadservice.user = User.objects.get(pk=user_id)
+        subroadservice.state = state
+        subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
+        subroadservice.staff_annotations = staff_annotations
+        subroadservice.fix = Fix.objects.get(pk=fix_id)
+        subroadservice.datetime = datetime
+
+        subroadservice.save()
+        return CreateSubRoadService(subroadservice=subroadservice, ok=True)
+
+### UPDATE
+class UpdateEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        client_id = graphene.String()
+        phone_number = graphene.String()
+        entry_conditions = graphene.String()
+        hardware_id = graphene.String()
+        datetime = graphene.String()
+        user_id = graphene.String()
+
+    ok = graphene.Boolean()
+    entry = graphene.Field(lambda: EntryType)
+
+    def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
+        entry = Entry.objects.get(pk=id)
+        entry.client = Client.objects.get(pk=client_id)
+        entry.phone_number = phone_number
+        entry.entry_conditions = entry_conditions
+        entry.hardware = Hardware.objects.get(pk=hardware_id)
+        entry.datetime = datetime
+        entry.user = User.objects.get(pk=client_id)
+
+        entry.save()
+        return UpdateEntry(entry=entry, ok=True)
+
+class UpdateRoadEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        client_id = graphene.String()
+        user_id = graphene.String()
+        address = graphene.String()
+        phone_number = graphene.String()
+        hardware_id = graphene.String()
+        customer_observation = graphene.String()
+        appointment_datetime = graphene.String()
+        fixed_appointment_datetime = graphene.String()
+
+    ok = graphene.Boolean()
+    roadentry = graphene.Field(lambda: RoadEntryType)
+
+    def mutate(self, info, id, client_id, user_id, address, phone_number, hardware_id, customer_observation, appointment_datetime, fixed_appointment_datetime):
+        roadentry = RoadEntry.objects.get(pk=id)
+        roadentry.client = Client.objects.get(pk=client_id)
+        roadentry.user = User.objects.get(pk=user_id)
+        roadentry.address = address
+        roadentry.phone_number = phone_number
+        roadentry.hardware = Hardware.objects.get(pk=hardware_id)
+        roadentry.customer_observation = customer_observation
+        roadentry.appointment_datetime = appointment_datetime
+        roadentry.fixed_appointment_datetime = fixed_appointment_datetime
+
+        roadentry.save()
+        return UpdateRoadEntry(roadentry=roadentry, ok=True)
+
+class UpdateClient(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        name = graphene.String()
+        phone_number = graphene.String()
+        address = graphene.String()
+        municipality = graphene.String()
+        source_id = graphene.String()
+        comment = graphene.String()
+
+    ok = graphene.Boolean()
+    client = graphene.Field(lambda: ClientType)
+
+    def mutate(self, info, id, name, phone_number, address, municipality, source_id, comment):
+        client = Client.objects.get(pk=id)
+        client.name = name
+        client.phone_number = phone_number
+        client.address = address
+        client.address = address 
+        client.municipality = municipality
+        client.source = Source.objects.get(pk=source_id)
+        client.comment = comment
+
+        client.save()
+        return UpdateClient(client=client, ok=True)
+
+class UpdateHardware(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        brand = graphene.String()
+        model = graphene.String()
+        type = graphene.String()
+        serial_number = graphene.String()
+
+    ok = graphene.Boolean()
+    hardware = graphene.Field(lambda: HardwareType)
+
+    def mutate(self, info, id, brand, model, type, serial_number):
+        hardware = Hardware.objects.get(pk=id)
+        hardware.brand = brand
+        hardware.model = model
+        hardware.type = type
+        hardware.serial_number = serial_number 
+
+        hardware.save()
+        return UpdateHardware(hardware=hardware, ok=True)
+
+class UpdateOtherPiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        name = graphene.String()
+        price = graphene.Float()
+
+    ok = graphene.Boolean()
+    other_piece = graphene.Field(lambda: OtherPieceType)
+
+    def mutate(self, info, id, name, price):
+        other_piece = OtherPiece.objects.get(pk=id)
+        other_piece.name = name
+        other_piece.price = price
+
+        other_piece.save()
+        return UpdateOtherPiece(other_piece=other_piece, ok=True)
+
+class UpdateFix(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        base_price = graphene.Float()
+        pieces = graphene.List(graphene.String)
+        other_pieces = graphene.List(graphene.String)
+
+    ok = graphene.Boolean()
+    fix = graphene.Field(lambda: FixType)
+
+    def mutate(self, info, id, base_price, pieces, other_pieces):
+        fix = Fix.objects.get(pk=id)
+        fix.base_price = base_price
+
+        if pieces:
+            fix.pieces.clear()
+            ps = [Piece.objects.get(pk=i) for i in pieces]
+            for piece in ps:
+               fix.pieces.add(piece)
+
+        if other_pieces:
+            fix.other_pieces.clear()
+            ps = [OtherPiece.objects.get(pk=i) for i in other_pieces]
+            for piece in ps:
+               fix.other_pieces.add(piece)
+
+        fix.save()
+        return UpdateFix(fix=fix, ok=True)
+
+class UpdateSubRoadService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        user_id = graphene.String()
+        state = graphene.String()
+        hardware_id = graphene.String()
+        staff_annotations = graphene.String()
+        fix_id = graphene.String()
+        datetime = graphene.String()
+
+    ok = graphene.Boolean()
+    subroadservice = graphene.Field(lambda: SubRoadServiceType)
+
+    def mutate(self, info, id, user_id, state, hardware_id, staff_annotations, fix_id, datetime):
+        subroadservice = SubRoadService.objects.get(pk=id)
+        subroadservice.user = User.objects.get(pk=user_id)
+        subroadservice.state = state
+        subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
+        subroadservice.staff_annotations = staff_annotations
+        subroadservice.fix = Fix.objects.get(pk=fix_id)
+        subroadservice.datetime = datetime
+
+        subroadservice.save()
+        return UpdateSubRoadService(subroadservice=subroadservice, ok=True)
+
+### DELETE
+
+class DeleteEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        Entry.objects.filter(pk=id).delete()
+        return DeleteEntry(ok=True)
+
+class DeleteRoadEntry(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        RoadEntry.objects.filter(pk=id).delete()
+        return DeleteRoadEntry(ok=True)
+
+class DeleteClient(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        Client.objects.filter(pk=id).delete()
+        return DeleteClient(ok=True)
+
+class DeleteHardware(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        Hardware.objects.filter(pk=id).delete()
+        return DeleteHardware(ok=True)
+
+class DeleteOtherPiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        OtherPiece.objects.filter(pk=id).delete()
+        return DeleteOtherPiece(ok=True)
+
+class DeleteFix(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        Fix.objects.filter(pk=id).delete()
+        return DeleteFix(ok=True)
+
+class DeleteSubRoadService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        SubRoadService.objects.filter(pk=id).delete()
+        return DeleteSubRoadService(ok=True)
+
+
+
+class Mutation(ObjectType):    
+    create_entry = CreateEntry.Field()
+    create_roadentry = CreateRoadEntry.Field()
+    create_client = CreateClient.Field()
+    create_hardware = CreateHardware.Field()
+    create_otherpiece = CreateOtherPiece.Field()
+    create_fix = CreateFix.Field()
+    create_subroadservice = CreateSubRoadService.Field()
+
+    update_entry = UpdateEntry.Field()
+    update_roadentry = UpdateRoadEntry.Field()
+    update_client = UpdateClient.Field()
+    update_hardware = UpdateHardware.Field()
+    update_otherpiece = UpdateOtherPiece.Field()
+    update_fix = UpdateFix.Field()
+    update_subroadservice = UpdateSubRoadService.Field()
+    
+    delete_entry = DeleteEntry.Field()
+    delete_roadentry = DeleteRoadEntry.Field()
+    delete_client = DeleteClient.Field()
+    delete_hardware = DeleteHardware.Field()
+    delete_otherpiece = DeleteOtherPiece.Field()
+    delete_fix = DeleteFix.Field()
+    delete_subroadservice = DeleteSubRoadService.Field()
