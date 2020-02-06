@@ -118,7 +118,7 @@ class Piece(models.Model):
 
     def count_warn(self):
         """
-        Return True if number of pices is small
+        Return True if number of pieces is small
         """
         # TODO Cambiar este numero, permitir poner uno dinamico
         return self.min_count < self.min_count if self.min_count else self.count <= 30
@@ -143,8 +143,8 @@ class Fix(models.Model):
     """Model definition for Fix."""
 
     base_price = models.FloatField()
-    pices = models.ManyToManyField(Piece, blank=True)
-    other_pices = models.ManyToManyField(OtherPiece,blank=True)
+    pieces = models.ManyToManyField(Piece, blank=True)
+    other_pieces = models.ManyToManyField(OtherPiece,blank=True)
 
     class Meta:
         """Meta definition for Fix."""
@@ -157,15 +157,15 @@ class Fix(models.Model):
         return 'Total price = %s'%(self.total_price())
 
     def pieces_price(self):
-        price = self.pices.all().aggregate(models.Sum('price'))['price__sum']
+        price = self.pieces.all().aggregate(models.Sum('price'))['price__sum']
         return price if price else 0
 
-    def other_pices_price(self):
-        price = self.other_pices.all().aggregate(models.Sum('price'))['price__sum']         
+    def other_pieces_price(self):
+        price = self.other_pieces.all().aggregate(models.Sum('price'))['price__sum']         
         return price if price else 0
     
     def total_price(self):
-        return self.base_price + self.pieces_price() + self.other_pices_price()
+        return self.base_price + self.pieces_price() + self.other_pieces_price()
 
 class RoadEntry(models.Model):
     """Model definition for RoadEntry."""
