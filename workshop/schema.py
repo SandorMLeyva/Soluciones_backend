@@ -128,7 +128,7 @@ class CreateEntry(Mutation):
         phone_number = graphene.String()
         entry_conditions = graphene.String()
         hardware_id = graphene.String()
-        # datetime = graphene.String()
+        datetime = graphene.String()
         user_id = graphene.String()
 
     ok = graphene.Boolean()
@@ -151,10 +151,10 @@ class CreateRoadEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
         client_id = graphene.String()
-        user_id = graphene.String()
+        user_id = graphene.Int()
         address = graphene.String()
         phone_number = graphene.String()
-        hardware_id = graphene.String()
+        hardware_id = graphene.Int()
         customer_observation = graphene.String()
         appointment_datetime = graphene.String()
         fixed_appointment_datetime = graphene.String()
@@ -183,7 +183,7 @@ class CreateClient(Mutation):
         phone_number = graphene.String()
         address = graphene.String()
         municipality = graphene.String()
-        source_id = graphene.String()
+        source_id = graphene.Int()
         comment = graphene.String()
 
     ok = graphene.Boolean()
@@ -244,8 +244,8 @@ class CreateFix(Mutation):
     class Arguments:
         # The input arguments for this mutation
         base_price = graphene.Float()
-        pieces = graphene.List(graphene.String)
-        other_pieces = graphene.List(graphene.String)
+        pieces = graphene.List(graphene.Int)
+        other_pieces = graphene.List(graphene.Int)
 
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
@@ -272,11 +272,11 @@ class CreateFix(Mutation):
 class CreateSubRoadService(Mutation):
     class Arguments:
         # The input arguments for this mutation
-        user_id = graphene.String()
+        user_id = graphene.Int()
         state = graphene.String()
-        hardware_id = graphene.String()
+        hardware_id = graphene.Int()
         staff_annotations = graphene.String()
-        fix_id = graphene.String()
+        fix_id = graphene.Int()
         datetime = graphene.String()
 
     ok = graphene.Boolean()
@@ -303,7 +303,7 @@ class UpdateEntry(Mutation):
         phone_number = graphene.String()
         entry_conditions = graphene.String()
         hardware_id = graphene.String()
-        # datetime = graphene.String()
+        datetime = graphene.String()
         user_id = graphene.String()
 
     ok = graphene.Boolean()
@@ -330,7 +330,7 @@ class UpdateRoadEntry(Mutation):
         user_id = graphene.String()
         address = graphene.String()
         phone_number = graphene.String()
-        hardware_id = graphene.String()
+        hardware_id = graphene.Int()
         customer_observation = graphene.String()
         appointment_datetime = graphene.String()
         fixed_appointment_datetime = graphene.String()
@@ -360,7 +360,7 @@ class UpdateClient(Mutation):
         phone_number = graphene.String()
         address = graphene.String()
         municipality = graphene.String()
-        source_id = graphene.String()
+        source_id = graphene.Int()
         comment = graphene.String()
 
     ok = graphene.Boolean()
@@ -424,8 +424,8 @@ class UpdateFix(Mutation):
         # The input arguments for this mutation
         id = graphene.String()
         base_price = graphene.Float()
-        pieces = graphene.List(graphene.String)
-        other_pieces = graphene.List(graphene.String)
+        pieces = graphene.List(graphene.Int)
+        other_pieces = graphene.List(graphene.Int)
 
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
@@ -455,9 +455,9 @@ class UpdateSubRoadService(Mutation):
         id = graphene.String()
         user_id = graphene.String()
         state = graphene.String()
-        hardware_id = graphene.String()
+        hardware_id = graphene.Int()
         staff_annotations = graphene.String()
-        fix_id = graphene.String()
+        fix_id = graphene.Int()
         datetime = graphene.String()
 
     ok = graphene.Boolean()
