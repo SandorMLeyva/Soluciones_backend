@@ -483,10 +483,16 @@ class DeleteEntry(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    entry = graphene.Field(lambda: EntryType)
 
     def mutate(self, info, id):
-        Entry.objects.filter(pk=id).delete()
-        return DeleteEntry(ok=True)
+        t = Entry.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteEntry(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteEntry(entry=item, ok=True)
 
 class DeleteRoadEntry(Mutation):
     class Arguments:
@@ -494,10 +500,16 @@ class DeleteRoadEntry(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    roadentry = graphene.Field(lambda: RoadEntryType)
 
     def mutate(self, info, id):
-        RoadEntry.objects.filter(pk=id).delete()
-        return DeleteRoadEntry(ok=True)
+        t = RoadEntry.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteRoadEntry(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteRoadEntry(roadentry=item, ok=True)
 
 class DeleteClient(Mutation):
     class Arguments:
@@ -505,10 +517,16 @@ class DeleteClient(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    client = graphene.Field(lambda: ClientType)
 
     def mutate(self, info, id):
-        Client.objects.filter(pk=id).delete()
-        return DeleteClient(ok=True)
+        t = Client.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteClient(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteClient(client=item, ok=True)
 
 class DeleteHardware(Mutation):
     class Arguments:
@@ -516,10 +534,16 @@ class DeleteHardware(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    hardware = graphene.Field(lambda: HardwareType)
 
     def mutate(self, info, id):
-        Hardware.objects.filter(pk=id).delete()
-        return DeleteHardware(ok=True)
+        t = Hardware.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteHardware(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteHardware(hardware=item, ok=True)
 
 class DeleteOtherPiece(Mutation):
     class Arguments:
@@ -527,10 +551,16 @@ class DeleteOtherPiece(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    other_piece = graphene.Field(lambda: OtherPieceType)
 
     def mutate(self, info, id):
-        OtherPiece.objects.filter(pk=id).delete()
-        return DeleteOtherPiece(ok=True)
+        t = OtherPiece.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteOtherPiece(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteOtherPiece(other_piece=item, ok=True)
 
 class DeleteFix(Mutation):
     class Arguments:
@@ -538,10 +568,16 @@ class DeleteFix(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    fix = graphene.Field(lambda: FixType)
 
     def mutate(self, info, id):
-        Fix.objects.filter(pk=id).delete()
-        return DeleteFix(ok=True)
+        t = Fix.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteFix(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteFix(fix=item, ok=True)
 
 class DeleteSubRoadService(Mutation):
     class Arguments:
@@ -549,10 +585,16 @@ class DeleteSubRoadService(Mutation):
         id = graphene.String()
 
     ok = graphene.Boolean()
+    subroadservice = graphene.Field(lambda: SubRoadServiceType)
 
     def mutate(self, info, id):
-        SubRoadService.objects.filter(pk=id).delete()
-        return DeleteSubRoadService(ok=True)
+        t = SubRoadService.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteSubRoadService(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteSubRoadService(subroadservice=item, ok=True)
 
 
 
