@@ -2,9 +2,10 @@ import graphene
 from graphene import Mutation, ObjectType
 from graphene_django import DjangoObjectType
 from workshop.models import *
+from workshop.src.stats_queries import *
 
 
-# Types
+#---------------------  TYPES -----------------------------------
 class SourceType(DjangoObjectType):
     class Meta:
         model = Source
@@ -53,7 +54,17 @@ class LogType(DjangoObjectType):
     class Meta:
         model = Log
 
-# Query
+# Queries output types
+class SourceCount(graphene.ObjectType):
+    source = graphene.String()
+    count = graphene.Int()
+    
+class WorkerEarnings(graphene.ObjectType):
+    worker = graphene.String()
+    earnings = graphene.Float()
+
+
+#---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
     sources = graphene.List(SourceType)
     clients = graphene.List(ClientType)
@@ -75,6 +86,27 @@ class Query(graphene.ObjectType):
     otherpiece = graphene.Field(OtherPieceType, id=graphene.String())
     fix = graphene.Field(FixType, id=graphene.String())
     subroadfix = graphene.Field(SubRoadServiceType, id=graphene.String())
+
+    sources_counts = graphene.List(SourceCount)
+    workers_earnings = graphene.List(WorkerEarnings)
+
+    test = graphene.List(WorkerEarnings)
+   
+    # Query for testing
+    def resolve_test(self, info):
+            return [ WorkerEarnings(worker.username,                    \
+                (0 if worker.sum == None else worker.sum) +             \
+                (0 if worker.road_sum == None else worker.road_sum) )   \
+            for worker in workers_earnings() ]
+
+    # Stats Queries
+    def resolve_sources_counts(self, info):
+        return [ SourceCount(src.name, src.count) for src in sources_counts() ]
+    def resolve_workers_earnings(self, info):
+            return [ WorkerEarnings(worker.username,                    \
+                (0 if worker.sum == None else worker.sum) +             \
+                (0 if worker.road_sum == None else worker.road_sum) )   \
+            for worker in workers_earnings() ]
 
     # Read ALL queries
     def resolve_sources(self, info, **kwargs):
@@ -118,7 +150,8 @@ class Query(graphene.ObjectType):
     def resolve_subroadservice(self, info, id):
         return SubRoadServiceType.objects.get(pk=id)
 
-# Mutations
+
+#---------------------  MUTATIONS -----------------------------------
 
 ### CREATE
 class CreateEntry(Mutation):

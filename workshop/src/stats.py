@@ -56,8 +56,5 @@ def workshop_money_by_year(year):
     return money
 
 
-# Sources
-
-
 
 
