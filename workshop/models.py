@@ -63,7 +63,7 @@ class Entry(models.Model):
     entry_conditions = models.TextField(blank=True)
     hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE) 
     datetime = models.DateTimeField(auto_now_add=True,auto_now=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         """Meta definition for Entry."""
@@ -171,7 +171,7 @@ class RoadEntry(models.Model):
     """Model definition for RoadEntry."""
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     address = models.TextField()
     phone_number = models.CharField(max_length=20) 
     hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE) 
