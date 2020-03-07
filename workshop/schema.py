@@ -365,7 +365,7 @@ class UpdateEntry(Mutation):
         entry.entry_conditions = entry_conditions
         entry.hardware = Hardware.objects.get(pk=hardware_id)
         # entry.datetime = datetime
-        entry.user = User.objects.get(pk=client_id)
+        entry.user = User.objects.get(pk=user_id)
 
         entry.save()
         return UpdateEntry(entry=entry, ok=True)
