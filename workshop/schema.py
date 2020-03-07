@@ -63,6 +63,11 @@ class WorkerEarnings(graphene.ObjectType):
     worker = graphene.String()
     earnings = graphene.Float()
 
+class WorkCompletionStats(graphene.ObjectType):
+    completed_services = graphene.Int()
+    uncompleted_services = graphene.Int()
+    completed_roadservices = graphene.Int()
+    uncompleted_roadservices = graphene.Int()
 
 #---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
@@ -89,15 +94,18 @@ class Query(graphene.ObjectType):
 
     sources_counts = graphene.List(SourceCount)
     workers_earnings = graphene.List(WorkerEarnings)
+    work_completion_stats = graphene.Field(WorkCompletionStats)
 
-    test = graphene.List(WorkerEarnings)
+    test = graphene.Field(WorkCompletionStats)
    
     # Query for testing
     def resolve_test(self, info):
-            return [ WorkerEarnings(worker.username,                    \
-                (0 if worker.sum == None else worker.sum) +             \
-                (0 if worker.road_sum == None else worker.road_sum) )   \
-            for worker in workers_earnings() ]
+        stats = work_completion_stats()
+        return WorkCompletionStats(
+            stats['completed_services'],
+            stats['uncompleted_services'],
+            stats['completed_roadservices'],
+            stats['uncompleted_roadservices'])
 
     # Stats Queries
     def resolve_sources_counts(self, info):
@@ -107,6 +115,13 @@ class Query(graphene.ObjectType):
                 (0 if worker.sum == None else worker.sum) +             \
                 (0 if worker.road_sum == None else worker.road_sum) )   \
             for worker in workers_earnings() ]
+    def resolve_work_completion_stats(self, info):
+        stats = work_completion_stats()
+        return WorkCompletionStats(
+            stats['completed_services'],
+            stats['uncompleted_services'],
+            stats['completed_roadservices'],
+            stats['uncompleted_roadservices'])
 
     # Read ALL queries
     def resolve_sources(self, info, **kwargs):
