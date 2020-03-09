@@ -81,6 +81,18 @@ class WorksDuringWeek(graphene.ObjectType):
     week = graphene.String()
     count = graphene.Int()
 
+class MoneyPerYears(graphene.ObjectType):
+    years = graphene.List(graphene.String)
+    total = graphene.List(graphene.Int)
+    
+class MoneyPerMonths(graphene.ObjectType):
+    months = graphene.List(graphene.String)
+    total = graphene.List(graphene.Int)
+
+class MoneyDuringWeek(graphene.ObjectType):
+    week = graphene.String()
+    total = graphene.Int()
+
 #---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
     sources = graphene.List(SourceType)
@@ -110,13 +122,16 @@ class Query(graphene.ObjectType):
     works_per_years = graphene.Field(WorksPerYears)
     works_per_months = graphene.Field(WorksPerMonths)
     works_during_week = graphene.Field(WorksDuringWeek, week=graphene.String())
+    money_per_years = graphene.Field(MoneyPerYears)
+    money_per_months = graphene.Field(MoneyPerMonths)
+    money_during_week = graphene.Field(MoneyDuringWeek, week=graphene.String())
 
-    test = graphene.Field(WorksPerYears)
+    test = graphene.Field(MoneyPerYears)
    
     # Query for testing
     def resolve_test(self, info):
-        years, counts = works_per_years()
-        return WorksPerYear(years, counts)
+        years, total = money_per_years()
+        return MoneyPerYears(years, total)
 
     # Stats Queries
     def resolve_sources_counts(self, info):
@@ -144,6 +159,18 @@ class Query(graphene.ObjectType):
     def resolve_works_during_week(self, info, week):
         week, count = works_during_week(week)
         return WorksDuringWeek(week, count)
+        
+    def resolve_money_per_years(self, info):
+        years, total = money_per_years()
+        return MoneyPerYears(years, total)
+        
+    def resolve_money_per_months(self, info):
+        months, total = money_per_months()
+        return MoneyPerMonths(months, total)
+        
+    def resolve_money_during_week(self, info, week):
+        wk, total = money_during_week(week)
+        return MoneyDuringWeek(wk, total)
 
 
     # Read ALL queries

@@ -57,28 +57,28 @@ def works_during_week(week):
     week_end = week_start + datetime.timedelta(days=7)
     works = Service.objects.filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
                            .filter(date__gte=(week_start)).count()
-    works = RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+    works += RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
                            .filter(datetime__gte=(week_start)).count()
     return datetime.datetime.strftime(week_start, "%Y/%m/%d") + " - " + datetime.datetime.strftime(week_end, "%Y/%m/%d"), works
 
 
 def money_per_years():
     money = defaultdict(int)
-    # for s in Service.objects.all():
-    #     money[s.date.year]+=s.
-    # for s in RoadService.objects.all():
-    #     money[s.datetime.year]+=1
-    # money = zip(money.keys(), money.values())
-    # money = list(money)
-    # money.sort(key = lambda x: int(x[0]))
-    # return [[x for x,_ in money], [y for _,y in money]]
+    for x in Service.objects.all():
+        money[x.date.year] += x.fix.total_price()
+    for x in RoadService.objects.all():
+        money[x.datetime.year] += x.fix.total_price()
+    money = zip(money.keys(), money.values())
+    money = list(money)
+    money.sort(key = lambda x: int(x[0]))
+    return [[x for x,_ in money], [y for _,y in money]]
 
 def money_per_months():
     money = defaultdict(int)
     for s in Service.objects.all():
-        money[str(s.date.month) + "-" + str(s.date.year)]+=1
+        money[str(s.date.month) + "-" + str(s.date.year)] += s.fix.total_price()
     for s in RoadService.objects.all():
-        money[str(s.datetime.month) + "-" + str(s.datetime.year)]+=1
+        money[str(s.datetime.month) + "-" + str(s.datetime.year)] += s.fix.total_price()
     money = zip(money.keys(), money.values())
     money = list(money)
     money.sort(key = lambda x: int(x[0].split('-')[0]) + 365 * int(x[0].split('-')[1]))
@@ -87,9 +87,9 @@ def money_per_months():
 def money_during_week(week):
     week_start = datetime.datetime.strptime(week, '%Y-%m-%d')
     week_end = week_start + datetime.timedelta(days=7)
-    money = Service.objects.filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
-                           .filter(date__gte=(week_start)).count()
-    money = RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
-                           .filter(datetime__gte=(week_start)).count()
-    return datetime.datetime.strftime(week_start, "%Y/%m/%d") + " - " + datetime.datetime.strftime(week_end, "%Y/%m/%d"), works
+    money = sum ([x.fix.total_price() for x in Service.objects.filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+                                                        .filter(date__gte=(week_start))])
+    money += sum ([x.fix.total_price() for x in RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+                                                        .filter(datetime__gte=(week_start))])
+    return datetime.datetime.strftime(week_start, "%Y/%m/%d") + " - " + datetime.datetime.strftime(week_end, "%Y/%m/%d"), money
 
