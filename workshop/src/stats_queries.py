@@ -1,6 +1,8 @@
 from workshop.models import *
 from django.db.models import Count, Sum
 from workshop.constants.models import FINISHED
+from collections import defaultdict
+import datetime
 
 
 # Sources
@@ -23,3 +25,35 @@ def work_completion_stats():
         'completed_roadservices': completed_rservs,
         'uncompleted_roadservices': rservices - completed_rservs
     }
+
+def works_per_years():
+    works = defaultdict(int)
+    for s in Service.objects.all():
+        works[s.date.year]+=1
+    for s in RoadService.objects.all():
+        works[s.datetime.year]+=1
+    works = zip(works.keys(), works.values())
+    works = list(works)
+    works.sort(key = lambda x: int(x[0]))
+    return [[x for x,_ in works], [y for _,y in works]]
+
+def works_per_months():
+    works = defaultdict(int)
+    for s in Service.objects.all():
+        works[str(s.date.month) + "-" + str(s.date.year)]+=1
+    for s in RoadService.objects.all():
+        works[str(s.datetime.month) + "-" + str(s.datetime.year)]+=1
+    works = zip(works.keys(), works.values())
+    works = list(works)
+    works.sort(key = lambda x: int(x[0].split('-')[0]) + 365 * int(x[0].split('-')[1]))
+    return [[x for x,_ in works], [y for _,y in works]]
+
+def works_during_week(week):
+    week_start = datetime.datetime.strptime(week, '%Y-%m-%d')
+    week_end = week_start + datetime.timedelta(days=7)
+    works = Service.objects.filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+                           .filter(date__gte=(week_start)).count()
+    works = RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+                           .filter(datetime__gte=(week_start)).count()
+    return datetime.datetime.strftime(week_start, "%Y/%m/%d") + " - " + datetime.datetime.strftime(week_end, "%Y/%m/%d"), works
+

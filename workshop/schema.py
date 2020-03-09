@@ -69,6 +69,18 @@ class WorkCompletionStats(graphene.ObjectType):
     completed_roadservices = graphene.Int()
     uncompleted_roadservices = graphene.Int()
 
+class WorksPerYears(graphene.ObjectType):
+    years = graphene.List(graphene.String)
+    count = graphene.List(graphene.Int)
+    
+class WorksPerMonths(graphene.ObjectType):
+    months = graphene.List(graphene.String)
+    count = graphene.List(graphene.Int)
+
+class WorksDuringWeek(graphene.ObjectType):
+    week = graphene.String()
+    count = graphene.Int()
+
 #---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
     sources = graphene.List(SourceType)
@@ -95,26 +107,27 @@ class Query(graphene.ObjectType):
     sources_counts = graphene.List(SourceCount)
     workers_earnings = graphene.List(WorkerEarnings)
     work_completion_stats = graphene.Field(WorkCompletionStats)
+    works_per_years = graphene.Field(WorksPerYears)
+    works_per_months = graphene.Field(WorksPerMonths)
+    works_during_week = graphene.Field(WorksDuringWeek, week=graphene.String())
 
-    test = graphene.Field(WorkCompletionStats)
+    test = graphene.Field(WorksPerYears)
    
     # Query for testing
     def resolve_test(self, info):
-        stats = work_completion_stats()
-        return WorkCompletionStats(
-            stats['completed_services'],
-            stats['uncompleted_services'],
-            stats['completed_roadservices'],
-            stats['uncompleted_roadservices'])
+        years, counts = works_per_years()
+        return WorksPerYear(years, counts)
 
     # Stats Queries
     def resolve_sources_counts(self, info):
         return [ SourceCount(src.name, src.count) for src in sources_counts() ]
+
     def resolve_workers_earnings(self, info):
             return [ WorkerEarnings(worker.username,                    \
                 (0 if worker.sum == None else worker.sum) +             \
                 (0 if worker.road_sum == None else worker.road_sum) )   \
             for worker in workers_earnings() ]
+    
     def resolve_work_completion_stats(self, info):
         stats = work_completion_stats()
         return WorkCompletionStats(
@@ -122,6 +135,19 @@ class Query(graphene.ObjectType):
             stats['uncompleted_services'],
             stats['completed_roadservices'],
             stats['uncompleted_roadservices'])
+
+    def resolve_works_per_years(self, info):
+        years, counts = works_per_years()
+        return WorksPerYears(years, counts)
+        
+    def resolve_works_per_months(self, info):
+        months, counts = works_per_months()
+        return WorksPerMonths(months, counts)
+        
+    def resolve_works_during_week(self, info, week):
+        week, count = works_during_week(week)
+        return WorksDuringWeek(week, count)
+
 
     # Read ALL queries
     def resolve_sources(self, info, **kwargs):
