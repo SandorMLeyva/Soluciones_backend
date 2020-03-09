@@ -218,6 +218,38 @@ class Query(graphene.ObjectType):
 
 #---------------------  MUTATIONS -----------------------------------
 
+### WORKSHOP
+class ServiceNextState(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        service_id = graphene.String()
+        state = graphene.String()
+
+    ok = graphene.Boolean()
+    service = graphene.Field(lambda: ServiceType)
+
+    def mutate(self, info, service_id, state):
+        service = Service.objects.get(pk=service_id)
+        service.state = state
+        service.save()
+        return ServiceNextState(service=service, ok=True)
+
+class RoadServiceNextState(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        roadservice_id = graphene.String()
+        state = graphene.String()
+
+    ok = graphene.Boolean()
+    roadservice = graphene.Field(lambda: ServiceType)
+
+    def mutate(self, info, roadservice_id, state):
+        roadservice = RoadService.objects.get(pk=roadservice_id)
+        roadservice.state = state
+        roadservice.save()
+        return ServiceNextState(roadservice=roadservice, ok=True)
+
+
 ### CREATE
 class CreateEntry(Mutation):
     class Arguments:
@@ -697,6 +729,9 @@ class DeleteSubRoadService(Mutation):
 
 
 class Mutation(ObjectType):    
+    set_nextstate_service = ServiceNextState.Field()
+    set_nextstate_roadservice = RoadServiceNextState.Field()
+
     create_entry = CreateEntry.Field()
     create_roadentry = CreateRoadEntry.Field()
     create_client = CreateClient.Field()
