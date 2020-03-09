@@ -123,10 +123,7 @@ class Query(graphene.ObjectType):
         return [ SourceCount(src.name, src.count) for src in sources_counts() ]
 
     def resolve_workers_earnings(self, info):
-            return [ WorkerEarnings(worker.username,                    \
-                (0 if worker.sum == None else worker.sum) +             \
-                (0 if worker.road_sum == None else worker.road_sum) )   \
-            for worker in workers_earnings() ]
+            return [ WorkerEarnings(k,v) for k, v in workers_earnings() ]
     
     def resolve_work_completion_stats(self, info):
         stats = work_completion_stats()
