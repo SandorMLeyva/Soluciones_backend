@@ -3,6 +3,7 @@ from graphene import Mutation, ObjectType
 from graphene_django import DjangoObjectType
 from workshop.models import *
 from workshop.src.stats_queries import *
+from django.contrib.auth.hashers import make_password
 
 
 #---------------------  TYPES -----------------------------------
@@ -132,12 +133,11 @@ class Query(graphene.ObjectType):
     money_per_months = graphene.Field(MoneyPerMonths)
     money_during_week = graphene.Field(MoneyDuringWeek, week=graphene.String())
 
-    test = graphene.Field(MoneyPerYears)
+    test = graphene.String()
    
     # Query for testing
     def resolve_test(self, info):
-        years, total = money_per_years()
-        return MoneyPerYears(years, total)
+        return make_password("1234")
 
     # Stats Queries
     def resolve_sources_counts(self, info):
@@ -290,7 +290,7 @@ class CreateUser(Mutation):
 
     def mutate(self, info, password, username, first_name, email, last_name):
         user = User()
-        user.password = password #TODO: encryption
+        user.password = make_password(password)
         user.is_superuser = 1
         user.username = username
         user.first_name = first_name
@@ -477,9 +477,10 @@ class CreateSubRoadService(Mutation):
         return CreateSubRoadService(subroadservice=subroadservice, ok=True)
 
 ### UPDATE
-class CreateUser(Mutation):
+class UpdateUser(Mutation):
     class Arguments:
         # The input arguments for this mutation
+        user_id = graphene.String()
         password = graphene.String()
         last_login = graphene.String()
         is_superuser = graphene.Int()
@@ -494,9 +495,9 @@ class CreateUser(Mutation):
     ok = graphene.Boolean()
     user = graphene.Field(lambda: UserType)
 
-    def mutate(self, info, password, last_login, is_superuser, username, first_name, email, is_staff, is_active, date_joined, last_name):
-        user = User()
-        user.password = password #TODO: encryption
+    def mutate(self, info, user_id, password, last_login, is_superuser, username, first_name, email, is_staff, is_active, date_joined, last_name):
+        user = User.objects.get(pk=user_id)
+        user.password = make_password(password)
         user.last_login = last_login
         user.is_superuser = is_superuser
         user.username = username
@@ -508,7 +509,7 @@ class CreateUser(Mutation):
         user.last_name = last_name
 
         user.save()
-        return CreateUser(user=user, ok=True)
+        return UpdateUser(user=user, ok=True)
 
 class UpdateEntry(Mutation):
     class Arguments:
@@ -842,7 +843,7 @@ class Mutation(ObjectType):
     create_fix = CreateFix.Field()
     create_subroadservice = CreateSubRoadService.Field()
 
-    # update_user = UpdateUser.Field()
+    update_user = UpdateUser.Field()
     update_entry = UpdateEntry.Field()
     update_roadentry = UpdateRoadEntry.Field()
     update_client = UpdateClient.Field()
@@ -851,7 +852,7 @@ class Mutation(ObjectType):
     update_fix = UpdateFix.Field()
     update_subroadservice = UpdateSubRoadService.Field()
     
-    # delete_user = DeleteUser.Field()
+    delete_user = DeleteUser.Field()
     delete_entry = DeleteEntry.Field()
     delete_roadentry = DeleteRoadEntry.Field()
     delete_client = DeleteClient.Field()
