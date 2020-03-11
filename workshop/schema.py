@@ -5,6 +5,7 @@ from workshop.models import *
 from workshop.src.stats_queries import *
 from django.contrib.auth.hashers import make_password
 from datetime import datetime as dt
+from workshop.constants.models import *
 
 
 #---------------------  TYPES -----------------------------------
@@ -251,7 +252,7 @@ class ServiceNextState(Mutation):
 
     def mutate(self, info, service_id, state):
         service = Service.objects.get(pk=service_id)
-        service.state = state
+        service.state = STATE_CHOICES_WORKSHOP[state][0]
         service.save()
         return ServiceNextState(service=service, ok=True)
 
@@ -266,7 +267,7 @@ class RoadServiceNextState(Mutation):
 
     def mutate(self, info, roadservice_id, state):
         roadservice = RoadService.objects.get(pk=roadservice_id)
-        roadservice.state = state
+        roadservice.state = STATE_CHOICES_ROAD[state][0]
         roadservice.save()
         return ServiceNextState(roadservice=roadservice, ok=True)
 
