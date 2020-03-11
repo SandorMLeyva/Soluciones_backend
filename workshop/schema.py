@@ -271,6 +271,38 @@ class RoadServiceNextState(Mutation):
 
 
 ### CREATE
+class CreateUser(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        password = graphene.String()
+        # last_login = graphene.String()
+        # is_superuser = graphene.String()
+        username = graphene.String()
+        first_name = graphene.String()
+        email = graphene.String()
+        # is_staff = graphene.String()
+        # is_active = graphene.String()
+        # date_joined = graphene.String()
+        last_name = graphene.String()
+
+    ok = graphene.Boolean()
+    user = graphene.Field(lambda: UserType)
+
+    def mutate(self, info, password, username, first_name, email, last_name):
+        user = User()
+        user.password = password #TODO: encryption
+        user.is_superuser = 1
+        user.username = username
+        user.first_name = first_name
+        user.email = email
+        user.is_staff = 1
+        user.is_staff = 1
+        user.date_joined = str(datetime.datetime.now())
+        user.last_name = last_name
+
+        user.save()
+        return CreateUser(user=user, ok=True)
+
 class CreateEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
@@ -445,6 +477,39 @@ class CreateSubRoadService(Mutation):
         return CreateSubRoadService(subroadservice=subroadservice, ok=True)
 
 ### UPDATE
+class CreateUser(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        password = graphene.String()
+        last_login = graphene.String()
+        is_superuser = graphene.Int()
+        username = graphene.String()
+        first_name = graphene.String()
+        email = graphene.String()
+        is_staff = graphene.Int()
+        is_active = graphene.Int()
+        date_joined = graphene.String()
+        last_name = graphene.String()
+
+    ok = graphene.Boolean()
+    user = graphene.Field(lambda: UserType)
+
+    def mutate(self, info, password, last_login, is_superuser, username, first_name, email, is_staff, is_active, date_joined, last_name):
+        user = User()
+        user.password = password #TODO: encryption
+        user.last_login = last_login
+        user.is_superuser = is_superuser
+        user.username = username
+        user.first_name = first_name
+        user.email = email
+        user.is_staff = is_staff
+        user.is_active = is_active
+        user.date_joined = date_joined
+        user.last_name = last_name
+
+        user.save()
+        return CreateUser(user=user, ok=True)
+
 class UpdateEntry(Mutation):
     class Arguments:
         # The input arguments for this mutation
@@ -626,6 +691,22 @@ class UpdateSubRoadService(Mutation):
         return UpdateSubRoadService(subroadservice=subroadservice, ok=True)
 
 ### DELETE
+class DeleteUser(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    user = graphene.Field(lambda: UserType)
+
+    def mutate(self, info, id):
+        t = User.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteUser(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteUser(entry=item, ok=True)
 
 class DeleteEntry(Mutation):
     class Arguments:
@@ -752,6 +833,7 @@ class Mutation(ObjectType):
     set_nextstate_service = ServiceNextState.Field()
     set_nextstate_roadservice = RoadServiceNextState.Field()
 
+    create_user = CreateUser.Field()
     create_entry = CreateEntry.Field()
     create_roadentry = CreateRoadEntry.Field()
     create_client = CreateClient.Field()
@@ -760,6 +842,7 @@ class Mutation(ObjectType):
     create_fix = CreateFix.Field()
     create_subroadservice = CreateSubRoadService.Field()
 
+    # update_user = UpdateUser.Field()
     update_entry = UpdateEntry.Field()
     update_roadentry = UpdateRoadEntry.Field()
     update_client = UpdateClient.Field()
@@ -768,6 +851,7 @@ class Mutation(ObjectType):
     update_fix = UpdateFix.Field()
     update_subroadservice = UpdateSubRoadService.Field()
     
+    # delete_user = DeleteUser.Field()
     delete_entry = DeleteEntry.Field()
     delete_roadentry = DeleteRoadEntry.Field()
     delete_client = DeleteClient.Field()
