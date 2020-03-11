@@ -6,6 +6,10 @@ from workshop.src.stats_queries import *
 
 
 #---------------------  TYPES -----------------------------------
+class UserType(DjangoObjectType):
+    class Meta:
+        model = User
+
 class SourceType(DjangoObjectType):
     class Meta:
         model = Source
@@ -95,6 +99,7 @@ class MoneyDuringWeek(graphene.ObjectType):
 
 #---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
+    users = graphene.List(UserType)
     sources = graphene.List(SourceType)
     clients = graphene.List(ClientType)
     hardwares = graphene.List(HardwareType)
@@ -108,6 +113,7 @@ class Query(graphene.ObjectType):
     roadservices = graphene.List(RoadServiceType)
     logs = graphene.List(LogType)
 
+    user = graphene.Field(UserType, id=graphene.String())
     entry = graphene.Field(EntryType, id=graphene.String())
     roadentry = graphene.Field(RoadEntryType, id=graphene.String())
     client = graphene.Field(ClientType, id=graphene.String())
@@ -174,6 +180,8 @@ class Query(graphene.ObjectType):
 
 
     # Read ALL queries
+    def resolve_users(self, info, **kwargs):
+        return User.objects.all()
     def resolve_sources(self, info, **kwargs):
         return Source.objects.all()
     def resolve_clients(self, info, **kwargs):
@@ -200,20 +208,32 @@ class Query(graphene.ObjectType):
         return Log.objects.all()
 
     # Read ONE Queries
-    def resolve_entry(self, info, id):
-        return Entry.objects.get(pk=id)
-    def resolve_roadentry(self, info, id):
-        return RoadEntry.objects.get(pk=id)
+    def resolve_user(self, info, id):
+        return User.objects.get(pk=id)
+    def resolve_source(self, info, id):
+        return Source.objects.get(pk=id)
     def resolve_client(self, info, id):
         return Client.objects.get(pk=id)
     def resolve_hardware(self, info, id):
         return Hardware.objects.get(pk=id)
+    def resolve_entry(self, info, id):
+        return Entry.objects.get(pk=id)
+    def resolve_service(self, info, id):
+        return Service.objects.get(pk=id)
+    def resolve_piece(self, info, id):
+        return Piece.objects.get(pk=id)
     def resolve_otherpiece(self, info, id):
         return OtherPiece.objects.get(pk=id)
     def resolve_fix(self, info, id):
         return Fix.objects.get(pk=id)
+    def resolve_roadentry(self, info, id):
+        return RoadEntry.objects.get(pk=id)
     def resolve_subroadservice(self, info, id):
-        return SubRoadServiceType.objects.get(pk=id)
+        return SubRoadService.objects.get(pk=id)
+    def resolve_roadservice(self, info, id):
+        return RoadService.objects.get(pk=id)
+    def resolve_log(self, info, id):
+        return Log.objects.get(pk=id)
 
 
 #---------------------  MUTATIONS -----------------------------------
