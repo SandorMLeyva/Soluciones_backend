@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType
 from workshop.models import *
 from workshop.src.stats_queries import *
 from django.contrib.auth.hashers import make_password
+from datetime import datetime as dt
 
 
 #---------------------  TYPES -----------------------------------
@@ -316,14 +317,13 @@ class CreateEntry(Mutation):
     ok = graphene.Boolean()
     entry = graphene.Field(lambda: EntryType)
 
-    # def mutate(self, info, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
-    def mutate(self, info, client_id, phone_number, entry_conditions, hardware_id,  user_id):
+    def mutate(self, info, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
         entry = Entry()
         entry.client = Client.objects.get(pk=client_id)
         entry.phone_number = phone_number
         entry.entry_conditions = entry_conditions
         entry.hardware = Hardware.objects.get(pk=hardware_id)
-        # entry.datetime = datetime
+        entry.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
         entry.user = User.objects.get(pk=user_id)
 
         entry.save()
@@ -352,8 +352,8 @@ class CreateRoadEntry(Mutation):
         roadentry.phone_number = phone_number
         roadentry.hardware = Hardware.objects.get(pk=hardware_id)
         roadentry.customer_observation = customer_observation
-        roadentry.appointment_datetime = appointment_datetime
-        roadentry.fixed_appointment_datetime = fixed_appointment_datetime
+        roadentry.appointment_datetime = dt.strptime(appointment_datetime, "%Y-%m-%d %H:%M:%S")
+        roadentry.fixed_appointment_datetime = dt.strptime(fixed_appointment_datetime, "%Y-%m-%d %H:%M:%S")
 
         roadentry.save()
         return CreateRoadEntry(roadentry=roadentry, ok=True)
@@ -471,7 +471,7 @@ class CreateSubRoadService(Mutation):
         subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
         subroadservice.staff_annotations = staff_annotations
         subroadservice.fix = Fix.objects.get(pk=fix_id)
-        subroadservice.datetime = datetime
+        subroadservice.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
 
         subroadservice.save()
         return CreateSubRoadService(subroadservice=subroadservice, ok=True)
@@ -498,14 +498,14 @@ class UpdateUser(Mutation):
     def mutate(self, info, user_id, password, last_login, is_superuser, username, first_name, email, is_staff, is_active, date_joined, last_name):
         user = User.objects.get(pk=user_id)
         user.password = make_password(password)
-        user.last_login = last_login
+        user.last_login = dt.strptime(last_login, "%Y-%m-%d %H:%M:%S")
         user.is_superuser = is_superuser
         user.username = username
         user.first_name = first_name
         user.email = email
         user.is_staff = is_staff
         user.is_active = is_active
-        user.date_joined = date_joined
+        user.date_joined = dt.strptime(date_joined, "%Y-%m-%d %H:%M:%S")
         user.last_name = last_name
 
         user.save()
@@ -519,20 +519,19 @@ class UpdateEntry(Mutation):
         phone_number = graphene.String()
         entry_conditions = graphene.String()
         hardware_id = graphene.String()
-        datetime = graphene.String()
+        datetime = graphene.types.DateTime()
         user_id = graphene.String()
 
     ok = graphene.Boolean()
     entry = graphene.Field(lambda: EntryType)
 
-    # def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
-    def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, user_id):
+    def mutate(self, info, id, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
         entry = Entry.objects.get(pk=id)
         entry.client = Client.objects.get(pk=client_id)
         entry.phone_number = phone_number
         entry.entry_conditions = entry_conditions
         entry.hardware = Hardware.objects.get(pk=hardware_id)
-        # entry.datetime = datetime
+        entry.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
         entry.user = User.objects.get(pk=user_id)
 
         entry.save()
@@ -562,8 +561,8 @@ class UpdateRoadEntry(Mutation):
         roadentry.phone_number = phone_number
         roadentry.hardware = Hardware.objects.get(pk=hardware_id)
         roadentry.customer_observation = customer_observation
-        roadentry.appointment_datetime = appointment_datetime
-        roadentry.fixed_appointment_datetime = fixed_appointment_datetime
+        roadentry.appointment_datetime = dt.strptime(appointment_datetime, "%Y-%m-%d %H:%M:%S")
+        roadentry.fixed_appointment_datetime = dt.strptime(fixed_appointment_datetime, "%Y-%m-%d %H:%M:%S")
 
         roadentry.save()
         return UpdateRoadEntry(roadentry=roadentry, ok=True)
@@ -686,7 +685,7 @@ class UpdateSubRoadService(Mutation):
         subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
         subroadservice.staff_annotations = staff_annotations
         subroadservice.fix = Fix.objects.get(pk=fix_id)
-        subroadservice.datetime = datetime
+        subroadservice.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
 
         subroadservice.save()
         return UpdateSubRoadService(subroadservice=subroadservice, ok=True)
