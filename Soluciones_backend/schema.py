@@ -1,7 +1,8 @@
 import graphene
-import workshop.schema
+from workshop.schema.mutations import Mutation
+from workshop.schema.query import Query as WorkshopQuery
 
-class Query(workshop.schema.Query, graphene.ObjectType):
+class Query(WorkshopQuery, graphene.ObjectType):
     pass
 
-schema = graphene.Schema(query=Query, mutation=workshop.schema.Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation)
