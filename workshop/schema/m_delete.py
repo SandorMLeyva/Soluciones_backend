@@ -140,3 +140,36 @@ class DeleteSubRoadService(Mutation):
         t.delete()
         return DeleteSubRoadService(subroadservice=item, ok=True)
 
+class DeleteRoadService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    roadservice = graphene.Field(lambda: RoadServiceType)
+
+    def mutate(self, info, id):
+        t = RoadService.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteRoadService(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteRoadService(roadservice=item, ok=True)
+
+class DeleteService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    service = graphene.Field(lambda: ServiceType)
+
+    def mutate(self, info, id):
+        t = Service.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteService(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteService(service=item, ok=True)

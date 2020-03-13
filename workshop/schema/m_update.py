@@ -261,3 +261,76 @@ class UpdateSubRoadService(Mutation):
 
         subroadservice.save()
         return UpdateSubRoadService(subroadservice=subroadservice, ok=True)
+
+class UpdateRoadService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        user_id = graphene.String()
+        state = graphene.String()
+        staff_annotations = graphene.String()
+        fix_id = graphene.String()
+        datetime = graphene.String()
+        otherservices_ids = graphene.List(graphene.String)
+        entry_id = graphene.String()
+
+    ok = graphene.Boolean()
+    roadservice = graphene.Field(lambda: RoadServiceType)
+
+    def mutate(self, info, id, user_id=None, state=None, otherservices_ids=None, fix_id=None, staff_annotations=None, datetime=None):
+        roadservice = RoadService.objects.get(pk=id)
+        roadservice.entry = Entry.objects.get(pk=entry_id)
+        if user_id:
+            roadservice.user = User.objects.get(pk=user_id)
+        if state:
+            roadservice.state = state
+        if staff_annotations:
+            roadservice.staff_annotations = staff_annotations
+        if fix_id:
+            roadservice.fix = Fix.objects.get(pk=fix_id)
+        if datetime:
+            roadservice.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
+        if otherservices_ids:
+            ps = [SubRoadService.objects.get(pk=id) for id in otherservices_ids]
+            for piece in ps:
+               roadservice.others_services.add(piece)
+
+        roadservice.save()
+        return UpdateRoadService(roadservice=roadservice, ok=True)
+
+class UpdateService(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        user_id = graphene.String()
+        state = graphene.String()
+        staff_annotations = graphene.String()
+        fix_id = graphene.String()
+        datetime = graphene.String()
+        otherservices_ids = graphene.List(graphene.String)
+        entry_id = graphene.String()
+
+    ok = graphene.Boolean()
+    service = graphene.Field(lambda: ServiceType)
+
+    def mutate(self, info, id, entry_id=None, user_id=None, state=None, otherservices_ids=None, fix_id=None, staff_annotations=None, datetime=None):
+        service = Service.objects.get(pk=id)
+        if entry_id:
+            service.entry = Entry.objects.get(pk=entry_id)
+        if user_id:
+            service.user = User.objects.get(pk=user_id)
+        if state:
+            service.state = state
+        if staff_annotations:
+            service.staff_annotations = staff_annotations
+        if fix_id:
+            service.fix = Fix.objects.get(pk=fix_id)
+        if datetime:
+            service.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
+        if otherservices_ids:
+            l = [SubService.objects.get(pk=id) for id in otherservices_ids]
+            for serv in l:
+               service.others_services.add(serv)
+
+        service.save()
+        return UpdateService(service=service, ok=True)
