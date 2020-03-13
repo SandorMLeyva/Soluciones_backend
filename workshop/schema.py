@@ -318,14 +318,17 @@ class CreateEntry(Mutation):
     ok = graphene.Boolean()
     entry = graphene.Field(lambda: EntryType)
 
-    def mutate(self, info, client_id, phone_number, entry_conditions, hardware_id, datetime, user_id):
+    def mutate(self, info, client_id, phone_number, hardware_id, datetime=None, user_id=None, entry_conditions=None):
         entry = Entry()
         entry.client = Client.objects.get(pk=client_id)
         entry.phone_number = phone_number
-        entry.entry_conditions = entry_conditions
+        if entry_conditions:
+            entry.entry_conditions = entry_conditions
         entry.hardware = Hardware.objects.get(pk=hardware_id)
-        entry.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
-        entry.user = User.objects.get(pk=user_id)
+        if datetime:
+            entry.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
+        if user_id:
+            entry.user = User.objects.get(pk=user_id)
 
         entry.save()
         return CreateEntry(entry=entry, ok=True)
@@ -345,16 +348,20 @@ class CreateRoadEntry(Mutation):
     ok = graphene.Boolean()
     roadentry = graphene.Field(lambda: RoadEntryType)
 
-    def mutate(self, info, client_id, user_id, address, phone_number, hardware_id, customer_observation, appointment_datetime, fixed_appointment_datetime):
+    def mutate(self, info, client_id, address, phone_number, hardware_id, user_id=None, customer_observation=None, appointment_datetime=None, fixed_appointment_datetime=None):
         roadentry = RoadEntry()
         roadentry.client = Client.objects.get(pk=client_id)
-        roadentry.user = User.objects.get(pk=user_id)
+        if user_id:
+            roadentry.user = User.objects.get(pk=user_id)
         roadentry.address = address
         roadentry.phone_number = phone_number
         roadentry.hardware = Hardware.objects.get(pk=hardware_id)
-        roadentry.customer_observation = customer_observation
-        roadentry.appointment_datetime = dt.strptime(appointment_datetime, "%Y-%m-%d %H:%M:%S")
-        roadentry.fixed_appointment_datetime = dt.strptime(fixed_appointment_datetime, "%Y-%m-%d %H:%M:%S")
+        if customer_observation:
+            roadentry.customer_observation = customer_observation
+        if appointment_datetime:
+            roadentry.appointment_datetime = dt.strptime(appointment_datetime, "%Y-%m-%d %H:%M:%S")
+        if fixed_appointment_datetime:
+            roadentry.fixed_appointment_datetime = dt.strptime(fixed_appointment_datetime, "%Y-%m-%d %H:%M:%S")
 
         roadentry.save()
         return CreateRoadEntry(roadentry=roadentry, ok=True)
@@ -372,7 +379,7 @@ class CreateClient(Mutation):
     ok = graphene.Boolean()
     client = graphene.Field(lambda: ClientType)
 
-    def mutate(self, info, name, phone_number, address, municipality, source_id, comment):
+    def mutate(self, info, name, phone_number, address, municipality, source_id, comment=None):
         client = Client()
         client.name = name
         client.phone_number = phone_number
@@ -380,7 +387,8 @@ class CreateClient(Mutation):
         client.address = address 
         client.municipality = municipality
         client.source = Source.objects.get(pk=source_id)
-        client.comment = comment
+        if None:
+            client.comment = comment
 
         client.save()
         return CreateClient(client=client, ok=True)
@@ -396,12 +404,13 @@ class CreateHardware(Mutation):
     ok = graphene.Boolean()
     hardware = graphene.Field(lambda: HardwareType)
 
-    def mutate(self, info, brand, model, type, serial_number):
+    def mutate(self, info, brand, model, type, serial_number=None):
         hardware = Hardware()
         hardware.brand = brand
         hardware.model = model
         hardware.type = type
-        hardware.serial_number = serial_number 
+        if serial_number:
+            hardware.serial_number = serial_number 
 
         hardware.save()
         return CreateHardware(hardware=hardware, ok=True)
@@ -433,7 +442,7 @@ class CreateFix(Mutation):
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
 
-    def mutate(self, info, base_price, pieces, other_pieces):
+    def mutate(self, info, base_price, pieces=None, other_pieces=None):
         fix = Fix()
         fix.base_price = base_price
 
@@ -465,14 +474,16 @@ class CreateSubRoadService(Mutation):
     ok = graphene.Boolean()
     subroadservice = graphene.Field(lambda: SubRoadServiceType)
 
-    def mutate(self, info, user_id, state, hardware_id, staff_annotations, fix_id, datetime):
+    def mutate(self, info, user_id, state, hardware_id, fix_id, staff_annotations=None, datetime=None):
         subroadservice = SubRoadService()
         subroadservice.user = User.objects.get(pk=user_id)
         subroadservice.state = state
         subroadservice.hardware = Hardware.objects.get(pk=hardware_id)
-        subroadservice.staff_annotations = staff_annotations
+        if staff_annotations:
+            subroadservice.staff_annotations = staff_annotations
         subroadservice.fix = Fix.objects.get(pk=fix_id)
-        subroadservice.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
+        if datetime:
+            subroadservice.datetime = dt.strptime(datetime, "%Y-%m-%d %H:%M:%S")
 
         subroadservice.save()
         return CreateSubRoadService(subroadservice=subroadservice, ok=True)
