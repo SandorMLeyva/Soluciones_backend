@@ -542,7 +542,7 @@ class UpdateEntry(Mutation):
         phone_number = graphene.String()
         entry_conditions = graphene.String()
         hardware_id = graphene.String()
-        datetime = graphene.types.DateTime()
+        datetime = graphene.types.String()
         user_id = graphene.String()
 
     ok = graphene.Boolean()
