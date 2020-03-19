@@ -1,4 +1,6 @@
 import graphene
+import datetime
+import workshop.constants.models as Constants 
 from workshop.schema.types import  *
 from workshop.src.stats_queries import *
 
@@ -33,6 +35,7 @@ class Query(graphene.ObjectType):
     log = graphene.Field(LogType, id=graphene.String())
 
     sources_counts = graphene.List(SourceCount)
+    services_count = graphene.Field(ServiceCount, state=graphene.Int(), time=graphene.String())
     workers_earnings = graphene.List(WorkerEarnings)
     work_completion_stats = graphene.Field(WorkCompletionStats)
     works_per_years = graphene.Field(WorksPerYears)
@@ -43,7 +46,7 @@ class Query(graphene.ObjectType):
     money_during_week = graphene.Field(MoneyDuringWeek, week=graphene.String())
 
     test = graphene.String()
-   
+
     # Query for testing
     def resolve_test(self, info):
         return make_password("1234")
@@ -87,6 +90,18 @@ class Query(graphene.ObjectType):
         wk, total = money_during_week(week)
         return MoneyDuringWeek(wk, total)
 
+    def resolve_services_count(self, info, state=None, time=None):
+        r = []
+        if state:
+            r = Service.objects.filter(state=Constants.STATE_CHOICES_WORKSHOP[state][0])
+        if time:
+            if time == "year":
+                r = Service.objects.filter(date__gte=datetime.datetime.today().replace(year=datetime.datetime.today().year-1, month=1, day=1))
+            elif time == "month":
+                r = Service.objects.filter(date__gte=datetime.datetime.today() - datetime.timedelta(days=datetime.datetime.today().day-1))
+            elif time == "week":
+                r = Service.objects.filter(date__gte=datetime.datetime.today() - datetime.timedelta(days=datetime.datetime.today().weekday()))
+        return ServiceCount(r.count())
 
     # Read ALL queries
     def resolve_users(self, info, **kwargs):
