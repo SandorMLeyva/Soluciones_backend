@@ -84,7 +84,7 @@ class Service(models.Model):
     staff_annotations = models.TextField(blank=True)
     date = models.DateField(auto_now=False, auto_now_add=True)
     fix = models.ForeignKey('Fix', on_delete=models.SET_NULL, blank=True, null=True)
-    seal_number = models.CharField(max_length=30)
+    seal_number = models.CharField(max_length=30, blank=True, null=True)
 
     class Meta:
         """Meta definition for Service."""
