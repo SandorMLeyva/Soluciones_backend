@@ -36,7 +36,7 @@ class Query(graphene.ObjectType):
     log = graphene.Field(LogType, id=graphene.String())
 
     sources_counts = graphene.List(SourceCount)
-    services_count = graphene.Field(ServiceCount, state=graphene.Int(), time=graphene.String())
+    services_count = graphene.Field(ServiceCount, state=graphene.String(), time=graphene.String())
     workers_earnings = graphene.List(WorkerEarnings)
     work_completion_stats = graphene.Field(WorkCompletionStats)
     works_per_years = graphene.Field(WorksPerYears)
@@ -95,7 +95,7 @@ class Query(graphene.ObjectType):
     def resolve_services_count(self, info, state=None, time=None):
         r = []
         if state:
-            r = Service.objects.filter(state=Constants.STATE_CHOICES_WORKSHOP[state][0])
+            r = Service.objects.filter(state=state)
         if time:
             if time == "year":
                 r = Service.objects.filter(date__gte=datetime.datetime.today().replace(year=datetime.datetime.today().year-1, month=1, day=1))
