@@ -128,6 +128,8 @@ class OtherPiece(models.Model):
 
     name = models.CharField(max_length=20, blank=False, null=False)
     price = models.FloatField(blank=False, null=False)
+    count = models.IntegerField(default=0, blank=False, null= False)
+    
 
     class Meta:
         """Meta definition for OtherPiece."""
