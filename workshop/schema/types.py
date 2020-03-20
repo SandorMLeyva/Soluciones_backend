@@ -93,3 +93,10 @@ class MoneyPerMonths(graphene.ObjectType):
 class MoneyDuringWeek(graphene.ObjectType):
     week = graphene.String()
     total = graphene.Int()
+
+class ServiceCount(graphene.ObjectType):
+    count = graphene.Int()
+
+class KeywordSearch(graphene.ObjectType):
+    services = graphene.List(ServiceType)
+    roadservices = graphene.List(RoadServiceType)
