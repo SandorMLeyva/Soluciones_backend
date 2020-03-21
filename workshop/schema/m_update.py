@@ -204,8 +204,8 @@ class UpdateFix(Mutation):
         # The input arguments for this mutation
         id = graphene.String()
         base_price = graphene.Float()
-        pieces = graphene.List(graphene.Int)
-        other_pieces = graphene.List(graphene.Int)
+        pieces = graphene.List(graphene.String)
+        other_pieces = graphene.List(graphene.String)
 
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
@@ -334,3 +334,32 @@ class UpdateService(Mutation):
 
         service.save()
         return UpdateService(service=service, ok=True)
+
+class UpdatePiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        name = graphene.String()
+        model = graphene.String()
+        price = graphene.Float()
+        count = graphene.Int()
+        min_count = graphene.Int()
+
+    ok = graphene.Boolean()
+    piece = graphene.Field(lambda: PieceType)
+
+    def mutate(self, info, id, price=None, count=None, name=None, model=None, min_count=None):
+        piece = Piece.objects.get(pk=id)
+        if name:
+            piece.name = name
+        if model:
+            piece.model = model
+        if price:
+            piece.price = price
+        if count:
+            piece.count = count
+        if min_count:
+            piece.min_count = min_count
+
+        piece.save()
+        return UpdatePiece(piece=piece, ok=True)

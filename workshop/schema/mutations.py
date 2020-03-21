@@ -55,6 +55,7 @@ class Mutation(ObjectType):
     create_subroadservice = CreateSubRoadService.Field()
     create_roadservice = CreateRoadService.Field()
     create_service = CreateService.Field()
+    create_piece = CreatePiece.Field()
     
     update_user = UpdateUser.Field()
     update_entry = UpdateEntry.Field()
@@ -66,6 +67,7 @@ class Mutation(ObjectType):
     update_subroadservice = UpdateSubRoadService.Field()
     update_roadservice = UpdateRoadService.Field()
     update_service = UpdateService.Field()
+    update_piece = UpdatePiece.Field() 
     
     delete_user = DeleteUser.Field()
     delete_entry = DeleteEntry.Field()
@@ -77,4 +79,5 @@ class Mutation(ObjectType):
     delete_subroadservice = DeleteSubRoadService.Field()
     delete_roadservice = DeleteRoadService.Field()
     delete_service = DeleteService.Field()
+    delete_piece = DeletePiece.Field() 
     

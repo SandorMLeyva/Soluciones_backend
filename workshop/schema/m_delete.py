@@ -173,3 +173,20 @@ class DeleteService(Mutation):
         item = t[0]
         t.delete()
         return DeleteService(service=item, ok=True)
+
+class DeletePiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    piece = graphene.Field(lambda: PieceType)
+
+    def mutate(self, info, id):
+        t = Piece.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeletePiece(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeletePiece(piece=item, ok=True)

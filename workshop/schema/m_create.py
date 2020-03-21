@@ -169,8 +169,8 @@ class CreateFix(Mutation):
     class Arguments:
         # The input arguments for this mutation
         base_price = graphene.Float()
-        pieces = graphene.List(graphene.Int)
-        other_pieces = graphene.List(graphene.Int)
+        pieces = graphene.List(graphene.String)
+        other_pieces = graphene.List(graphene.String)
 
     ok = graphene.Boolean()
     fix = graphene.Field(lambda: FixType)
@@ -290,3 +290,27 @@ class CreateService(Mutation):
 
         service.save()
         return CreateService(service=service, ok=True)
+
+class CreatePiece(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        name = graphene.String()
+        model = graphene.String()
+        price = graphene.Float()
+        count = graphene.Int()
+        min_count = graphene.Int()
+
+    ok = graphene.Boolean()
+    piece = graphene.Field(lambda: PieceType)
+
+    def mutate(self, info, price, count, name, model, min_count=None):
+        Piece = Piece()
+        Piece.name = name
+        Piece.model = model
+        Piece.count = count
+        Piece.price = price
+        if min_count:
+            Piece.min_count = min_count
+
+        Piece.save()
+        return CreatePiece(piece=piece, ok=True)
