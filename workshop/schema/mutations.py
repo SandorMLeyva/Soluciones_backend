@@ -9,41 +9,51 @@ from workshop.schema.m_update import *
 
 #--------------------------  WORKSHOP MUTATIONS -----------------------------
 
-class ServiceNextState(Mutation):
+class ServiceMoveState(Mutation):
     class Arguments:
         # The input arguments for this mutation
         service_id = graphene.String()
-        state = graphene.String()
+        set_previous = graphene.Boolean()
 
     ok = graphene.Boolean()
     service = graphene.Field(lambda: ServiceType)
 
-    def mutate(self, info, service_id, state):
+    def mutate(self, info, service_id, set_previous=False):
         service = Service.objects.get(pk=service_id)
-        service.state = STATE_CHOICES_WORKSHOP[state][0]
+        new_state = next(ind+1 for ind, x in enumerate(STATE_CHOICES_WORKSHOP) if x[0] == service.state)
+        if set_previous:
+            new_state = max(0, new_state-2)
+        last_state = len(STATE_CHOICES_WORKSHOP)-1
+        service.state = STATE_CHOICES_WORKSHOP[min(last_state, new_state)][0]
+        
         service.save()
-        return ServiceNextState(service=service, ok=True)
+        return ServiceMoveState(service=service, ok=True)
 
-class RoadServiceNextState(Mutation):
+class RoadServiceMoveState(Mutation):
     class Arguments:
         # The input arguments for this mutation
         roadservice_id = graphene.String()
-        state = graphene.String()
+        set_previous = graphene.Boolean()
 
     ok = graphene.Boolean()
-    roadservice = graphene.Field(lambda: ServiceType)
+    roadservice = graphene.Field(lambda: RoadServiceType)
 
-    def mutate(self, info, roadservice_id, state):
+    def mutate(self, info, roadservice_id, set_previous=False):
         roadservice = RoadService.objects.get(pk=roadservice_id)
-        roadservice.state = STATE_CHOICES_ROAD[state][0]
+        new_state = next(ind+1 for ind, x in enumerate(STATE_CHOICES_ROAD) if x[0] == roadservice.state)
+        last_state = len(STATE_CHOICES_ROAD)-1
+        if set_previous:
+            new_state = max(0, new_state-2)
+        roadservice.state = STATE_CHOICES_ROAD[min(last_state, new_state)][0]
+        
         roadservice.save()
-        return ServiceNextState(roadservice=roadservice, ok=True)
+        return RoadServiceMoveState(roadservice=roadservice, ok=True)
 
 #------------------------------------------------------------------------------
 
 class Mutation(ObjectType):    
-    set_nextstate_service = ServiceNextState.Field()
-    set_nextstate_roadservice = RoadServiceNextState.Field()
+    set_state_service = ServiceMoveState.Field()
+    set_state_roadservice = RoadServiceMoveState.Field()
 
     create_user = CreateUser.Field()
     create_entry = CreateEntry.Field()
