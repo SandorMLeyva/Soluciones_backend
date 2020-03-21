@@ -3,6 +3,7 @@ import datetime
 import workshop.constants.models as Constants 
 from workshop.schema.types import  *
 from workshop.src.stats_queries import *
+from django.db.models import Q
 
 #---------------------  QUERIES -----------------------------------
 class Query(graphene.ObjectType):
@@ -44,6 +45,7 @@ class Query(graphene.ObjectType):
     money_per_years = graphene.Field(MoneyPerYears)
     money_per_months = graphene.Field(MoneyPerMonths)
     money_during_week = graphene.Field(MoneyDuringWeek, week=graphene.String())
+    keyword_search = graphene.Field(KeywordSearch, keyword=graphene.String())
 
     test = graphene.String()
 
@@ -102,6 +104,13 @@ class Query(graphene.ObjectType):
             elif time == "week":
                 r = Service.objects.filter(date__gte=datetime.datetime.today() - datetime.timedelta(days=datetime.datetime.today().weekday()))
         return ServiceCount(r.count())
+
+    def resolve_keyword_search(self, info, keyword):
+        matched_services = Service.objects.filter(Q(entry__client__name__contains=keyword) | \
+                                                Q(entry__hardware__brand__contains=keyword))
+        matched_roadservices = RoadService.objects.filter(Q(entry__client__name__contains=keyword) | \
+                                                Q(entry__hardware__brand__contains=keyword))
+        return KeywordSearch(matched_services, matched_roadservices)
 
     # Read ALL queries
     def resolve_users(self, info, **kwargs):
