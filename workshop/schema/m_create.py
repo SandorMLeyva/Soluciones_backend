@@ -178,6 +178,7 @@ class CreateFix(Mutation):
     def mutate(self, info, base_price, pieces=None, other_pieces=None):
         fix = Fix()
         fix.base_price = base_price
+        fix.save()
 
         if pieces:
             fix.pieces.clear()
