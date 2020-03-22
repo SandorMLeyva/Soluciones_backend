@@ -1,3 +1,4 @@
+import sqlite3
 import graphene
 from graphene import Mutation
 from workshop.schema.types import *
@@ -124,6 +125,14 @@ class CreateClient(Mutation):
             client.comment = comment
 
         client.save()
+
+        # Save client's contact info to phone database
+        conn = sqlite3.connect('movil.db')
+        c = conn.cursor()
+        c.execute(f"INSERT INTO movil VALUES ('{phone_number}','{name}','', '{address}', '')")
+        conn.commit()
+        conn.close()
+
         return CreateClient(client=client, ok=True)
 
 class CreateHardware(Mutation):

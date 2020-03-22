@@ -1,3 +1,4 @@
+import sqlite3
 import graphene
 from graphene import Mutation
 from workshop.schema.types import *
@@ -67,8 +68,15 @@ class DeleteClient(Mutation):
         t = Client.objects.filter(pk=id)
         if len(t) == 0:
             return DeleteClient(ok=False)
-        
         item = t[0]
+
+        # Delete client from phone database
+        conn = sqlite3.connect('movil.db')
+        c = conn.cursor()
+        c.execute(f"DELETE FROM movil WHERE number = '{item.phone_number}'")
+        conn.commit()
+        conn.close()
+        
         t.delete()
         return DeleteClient(client=item, ok=True)
 

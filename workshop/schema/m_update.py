@@ -1,3 +1,4 @@
+import sqlite3
 import graphene
 from graphene import Mutation
 from workshop.schema.types import *
@@ -137,12 +138,19 @@ class UpdateClient(Mutation):
 
     def mutate(self, info, id, name=None, phone_number=None, address=None, municipality=None, source_id=None, comment=None):
         client = Client.objects.get(pk=id)
+        query = "UPDATE movil SET "
+        atts = []
+        old_num = ""
         if name:
             client.name = name
+            atts.append(f"name = '{name}'")
         if phone_number:
+            old_num  = client.phone_number
             client.phone_number = phone_number
+            atts.append(f"number = '{phone_number}'")
         if address:
             client.address = address
+            atts.append(f"address = '{address}'")
         if municipality:
             client.municipality = municipality
         if source_id:
@@ -151,6 +159,14 @@ class UpdateClient(Mutation):
             client.comment = comment
 
         client.save()
+
+        # Update client in contact database
+        conn = sqlite3.connect('movil.db')
+        query += ", ".join(atts) + f" WHERE number = {phone_number}"
+        c = conn.cursor()
+        c.execute(query)
+        conn.commit()
+        conn.close()
         return UpdateClient(client=client, ok=True)
 
 class UpdateHardware(Mutation):
