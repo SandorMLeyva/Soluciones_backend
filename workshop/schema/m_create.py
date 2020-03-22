@@ -162,14 +162,16 @@ class CreateOtherPiece(Mutation):
         # The input arguments for this mutation
         name = graphene.String()
         price = graphene.Float()
+        count = graphene.Int()
 
     ok = graphene.Boolean()
     other_piece = graphene.Field(lambda: OtherPieceType)
 
-    def mutate(self, info, name, price):
+    def mutate(self, info, name, price, count):
         other_piece = OtherPiece()
         other_piece.name = name
         other_piece.price = price
+        other_piece.count = count
 
         other_piece.save()
         return CreateOtherPiece(other_piece=other_piece, ok=True)
