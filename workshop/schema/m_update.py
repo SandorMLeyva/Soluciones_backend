@@ -233,13 +233,13 @@ class UpdateFix(Mutation):
 
         if pieces:
             fix.pieces.clear()
-            ps = [Piece.objects.get(pk=i) for i in pieces]
+            ps = [PieceRequest.objects.get(pk=i) for i in pieces]
             for piece in ps:
                fix.pieces.add(piece)
 
         if other_pieces:
             fix.other_pieces.clear()
-            ps = [OtherPiece.objects.get(pk=i) for i in other_pieces]
+            ps = [OtherPieceRequest.objects.get(pk=i) for i in other_pieces]
             for piece in ps:
                fix.other_pieces.add(piece)
 
