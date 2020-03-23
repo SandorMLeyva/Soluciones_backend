@@ -1,5 +1,5 @@
 from workshop.models import *
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from workshop.constants.models import FINISHED
 from collections import defaultdict
 import datetime
@@ -12,17 +12,17 @@ def sources_counts():
 
 def workers_earnings():
     wkrs_earnings = defaultdict(float)
-    for x in Service.objects.all():
+    for x in Service.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         wkrs_earnings[x.user.username] += x.fix.total_price()
-    for x in RoadService.objects.all():
+    for x in RoadService.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         wkrs_earnings[x.user.username] += x.fix.total_price()
     return wkrs_earnings.items()
 
 def work_completion_stats():
     services = Service.objects.all().count()
-    completed_servs = Service.objects.filter(state=FINISHED).count()
+    completed_servs = Service.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)).count()
     rservices = RoadService.objects.all().count()
-    completed_rservs = RoadService.objects.filter(state=FINISHED).count()
+    completed_rservs = RoadService.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)).count()
     return {
         'completed_services': completed_servs,
         'uncompleted_services': services - completed_servs,
@@ -64,9 +64,9 @@ def works_during_week(week):
 
 def money_per_years():
     money = defaultdict(int)
-    for x in Service.objects.all():
+    for x in Service.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         money[x.date.year] += x.fix.total_price()
-    for x in RoadService.objects.all():
+    for x in RoadService.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         money[x.datetime.year] += x.fix.total_price()
     money = zip(money.keys(), money.values())
     money = list(money)
@@ -75,9 +75,9 @@ def money_per_years():
 
 def money_per_months():
     money = defaultdict(int)
-    for s in Service.objects.all():
+    for s in Service.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         money[str(s.date.month) + "-" + str(s.date.year)] += s.fix.total_price()
-    for s in RoadService.objects.all():
+    for s in RoadService.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)):
         money[str(s.datetime.month) + "-" + str(s.datetime.year)] += s.fix.total_price()
     money = zip(money.keys(), money.values())
     money = list(money)
@@ -87,9 +87,11 @@ def money_per_months():
 def money_during_week(week):
     week_start = datetime.datetime.strptime(week, '%Y-%m-%d')
     week_end = week_start + datetime.timedelta(days=7)
-    money = sum ([x.fix.total_price() for x in Service.objects.filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
-                                                        .filter(date__gte=(week_start))])
-    money += sum ([x.fix.total_price() for x in RoadService.objects.filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
-                                                        .filter(datetime__gte=(week_start))])
+    money = sum ([x.fix.total_price() for x in Service.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)) \
+        .filter(date__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+        .filter(date__gte=(week_start))])
+    money += sum ([x.fix.total_price() for x in RoadService.objects.filter(Q(state=FINISHED) | Q(state=WARRANTY) | Q(state=NO_WARRANTY)) \
+        .filter(datetime__lte=datetime.datetime.strftime(week_end, "%Y-%m-%d")) \
+        .filter(datetime__gte=(week_start))])
     return datetime.datetime.strftime(week_start, "%Y/%m/%d") + " - " + datetime.datetime.strftime(week_end, "%Y/%m/%d"), money
 
