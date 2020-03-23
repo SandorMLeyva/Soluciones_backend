@@ -141,12 +141,47 @@ class OtherPiece(models.Model):
         """Unicode representation of OtherPiece."""
         return "%s -> %s"%(self.name, self.price)
 
+class PieceRequest(models.Model):
+    """Model definition for PieceRequest."""
+
+    piece = models.ForeignKey(Piece, on_delete=models.CASCADE)
+    count = models.IntegerField(default=1, blank=False, null= False)
+
+
+    class Meta:
+        """Meta definition for PieceRequest."""
+
+        verbose_name = 'PieceRequest'
+        verbose_name_plural = 'PieceRequests'
+
+    def __str__(self):
+        """Unicode representation of Piece Request."""
+        return "%s of %s-%s"%(self.count, self.piece.model, self.piece.name)
+
+class OtherPieceRequest(models.Model):
+    """Model definition for OtherPieceRequest."""
+
+    otherpiece = models.ForeignKey(OtherPiece, on_delete=models.CASCADE)
+    count = models.IntegerField(default=1, blank=False, null= False)
+
+
+    class Meta:
+        """Meta definition for OtherPieceRequest."""
+
+        verbose_name = 'OtherPieceRequest'
+        verbose_name_plural = 'OtherPieceRequests'
+
+    def __str__(self):
+        """Unicode representation of OtherPiece Request."""
+        return "%s of %s"%(self.count, self.otherpiece.name)
+
+
 class Fix(models.Model):
     """Model definition for Fix."""
 
     base_price = models.FloatField()
-    pieces = models.ManyToManyField(Piece, blank=True)
-    other_pieces = models.ManyToManyField(OtherPiece,blank=True)
+    pieces = models.ManyToManyField(PieceRequest, blank=True)
+    other_pieces = models.ManyToManyField(OtherPieceRequest,blank=True)
 
     class Meta:
         """Meta definition for Fix."""
@@ -159,11 +194,11 @@ class Fix(models.Model):
         return 'Total price = %s'%(self.total_price())
 
     def pieces_price(self):
-        price = self.pieces.all().aggregate(models.Sum('price'))['price__sum']
+        price = self.pieces.all().aggregate(models.Sum('piece__price'))['price__sum']
         return price if price else 0
 
     def other_pieces_price(self):
-        price = self.other_pieces.all().aggregate(models.Sum('price'))['price__sum']         
+        price = self.other_pieces.all().aggregate(models.Sum('otherpiece__price'))['price__sum']         
         return price if price else 0
     
     def total_price(self):
