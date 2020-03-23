@@ -194,11 +194,11 @@ class Fix(models.Model):
         return 'Total price = %s'%(self.total_price())
 
     def pieces_price(self):
-        price = self.pieces.all().aggregate(models.Sum('piece__price'))['price__sum']
+        price = self.pieces.all().aggregate(models.Sum('piece__price'))['piece__price__sum']
         return price if price else 0
 
     def other_pieces_price(self):
-        price = self.other_pieces.all().aggregate(models.Sum('otherpiece__price'))['price__sum']         
+        price = self.other_pieces.all().aggregate(models.Sum('otherpiece__price'))['otherpiece__price__sum']         
         return price if price else 0
     
     def total_price(self):
