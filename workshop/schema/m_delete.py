@@ -198,3 +198,37 @@ class DeletePiece(Mutation):
         item = t[0]
         t.delete()
         return DeletePiece(piece=item, ok=True)
+
+class DeletePieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    piecerequest = graphene.Field(lambda: PieceRequestType)
+
+    def mutate(self, info, id):
+        t = PieceRequest.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeletePieceRequest(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeletePieceRequest(piecerequest=item, ok=True)
+
+class DeleteOtherPieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+
+    ok = graphene.Boolean()
+    otherpiecerequest = graphene.Field(lambda: PieceType)
+
+    def mutate(self, info, id):
+        t = OtherPieceRequest.objects.filter(pk=id)
+        if len(t) == 0:
+            return DeleteOtherPieceRequest(ok=False)
+        
+        item = t[0]
+        t.delete()
+        return DeleteOtherPieceRequest(otherpiecerequest=item, ok=True)

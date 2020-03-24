@@ -35,6 +35,14 @@ class OtherPieceType(DjangoObjectType):
     class Meta:
         model = OtherPiece
 
+class PieceRequestType(DjangoObjectType):
+    class Meta:
+        model = PieceRequest
+
+class OtherPieceRequestType(DjangoObjectType):
+    class Meta:
+        model = OtherPieceRequest
+
 class FixType(DjangoObjectType):
     class Meta:
         model = Fix

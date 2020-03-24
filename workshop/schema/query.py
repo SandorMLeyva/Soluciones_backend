@@ -15,6 +15,8 @@ class Query(graphene.ObjectType):
     services = graphene.List(ServiceType)
     pieces = graphene.List(PieceType)
     otherpieces = graphene.List(OtherPieceType)
+    piecerequests = graphene.List(PieceRequestType)
+    otherpiecerequests = graphene.List(OtherPieceRequestType)
     fixs = graphene.List(FixType)
     roadentries = graphene.List(RoadEntryType)
     subroadservices = graphene.List(SubRoadServiceType)
@@ -29,6 +31,8 @@ class Query(graphene.ObjectType):
     service = graphene.Field(ServiceType, id=graphene.String())
     piece = graphene.Field(PieceType, id=graphene.String())
     otherpiece = graphene.Field(OtherPieceType, id=graphene.String())
+    piecerequest = graphene.Field(PieceRequestType, id=graphene.String())
+    otherpiecerequest = graphene.Field(OtherPieceRequestType, id=graphene.String())
     fix = graphene.Field(FixType, id=graphene.String())
     roadentry = graphene.Field(RoadEntryType, id=graphene.String())
     subroadservice = graphene.Field(SubRoadServiceType, id=graphene.String())
@@ -129,6 +133,10 @@ class Query(graphene.ObjectType):
         return Piece.objects.all()
     def resolve_otherpieces(self, info, **kwargs):
         return OtherPiece.objects.all()
+    def resolve_piecerequests(self, info, **kwargs):
+        return PieceRequest.objects.all()
+    def resolve_otherpiecerequests(self, info, **kwargs):
+        return OtherPieceRequest.objects.all()
     def resolve_fixs(self, info, **kwargs):
         return Fix.objects.all()
     def resolve_roadentries(self, info, **kwargs):
@@ -157,6 +165,10 @@ class Query(graphene.ObjectType):
         return Piece.objects.get(pk=id)
     def resolve_otherpiece(self, info, id):
         return OtherPiece.objects.get(pk=id)
+    def resolve_piecerequest(self, info, id):
+        return PieceRequest.objects.get(pk=id)
+    def resolve_otherpiecerequest(self, info, id):
+        return OtherPieceRequest.objects.get(pk=id)
     def resolve_fix(self, info, id):
         return Fix.objects.get(pk=id)
     def resolve_roadentry(self, info, id):

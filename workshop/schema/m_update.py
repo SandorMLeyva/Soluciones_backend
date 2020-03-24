@@ -379,3 +379,44 @@ class UpdatePiece(Mutation):
 
         piece.save()
         return UpdatePiece(piece=piece, ok=True)
+        
+class UpdatePieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        piece = graphene.String()
+        count = graphene.Int()
+
+    ok = graphene.Boolean()
+    piecerequest = graphene.Field(lambda: PieceRequestType)
+
+    def mutate(self, info, id, piece=None, count=None):
+        piecerequest = PieceRequest.objects.get(pk=id)
+        if piece:
+            piecerequest.piece = Piece.objects.get(pk=piece)
+        if count:
+            piecerequest.count = count
+
+        piecerequest.save()
+        return UpdatePieceRequest(piecerequest=piecerequest, ok=True)
+        
+class UpdateOtherPieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.String()
+        otherpiece = graphene.String()
+        count = graphene.Int()
+
+    ok = graphene.Boolean()
+    otherpiecerequest = graphene.Field(lambda: OtherPieceRequestType)
+
+    def mutate(self, info, id, otherpiece=None, count=None):
+        otherpiecerequest = OtherPieceRequest.objects.get(pk=id)
+        if otherpiece:
+            otherpiecerequest.otherpiece = OtherPiece.objects.get(pk=otherpiece)
+        if count:
+            otherpiecerequest.count = count
+
+        otherpiecerequest.save()
+        return UpdateOtherPieceRequest(otherpiecerequest=otherpiecerequest, ok=True)
+        

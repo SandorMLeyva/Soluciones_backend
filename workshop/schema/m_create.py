@@ -316,13 +316,48 @@ class CreatePiece(Mutation):
     piece = graphene.Field(lambda: PieceType)
 
     def mutate(self, info, price, count, name, model, min_count=None):
-        Piece = Piece()
-        Piece.name = name
-        Piece.model = model
-        Piece.count = count
-        Piece.price = price
+        piece = Piece()
+        piece.name = name
+        piece.model = model
+        piece.count = count
+        piece.price = price
         if min_count:
-            Piece.min_count = min_count
+            piece.min_count = min_count
 
-        Piece.save()
+        piece.save()
         return CreatePiece(piece=piece, ok=True)
+   
+class CreatePieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        piece = graphene.String()
+        count = graphene.Int()
+
+    ok = graphene.Boolean()
+    piecerequest = graphene.Field(lambda: PieceRequestType)
+
+    def mutate(self, info, piece, count):
+        piecerequest = PieceRequest()
+        piecerequest.piece = Piece.objects.get(pk=piece)
+        piecerequest.count = count
+
+        piecerequest.save()
+        return CreatePieceRequest(piecerequest=piecerequest, ok=True)
+        
+class CreateOtherPieceRequest(Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        otherpiece = graphene.String()
+        count = graphene.Int()
+
+    ok = graphene.Boolean()
+    otherpiecerequest = graphene.Field(lambda: OtherPieceRequestType)
+
+    def mutate(self, info, otherpiece, count):
+        otherpiecerequest = OtherPieceRequest()
+        otherpiecerequest.otherpiece = OtherPiece.objects.get(pk=otherpiece)
+        otherpiecerequest.count = count
+
+        otherpiecerequest.save()
+        return CreateOtherPieceRequest(otherpiecerequest=otherpiecerequest, ok=True)
+        

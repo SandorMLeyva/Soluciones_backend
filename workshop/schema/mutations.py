@@ -66,6 +66,8 @@ class Mutation(ObjectType):
     create_roadservice = CreateRoadService.Field()
     create_service = CreateService.Field()
     create_piece = CreatePiece.Field()
+    create_piece_request = CreatePieceRequest.Field()
+    create_otherpiece_request = CreateOtherPieceRequest.Field()
     
     update_user = UpdateUser.Field()
     update_entry = UpdateEntry.Field()
@@ -78,6 +80,8 @@ class Mutation(ObjectType):
     update_roadservice = UpdateRoadService.Field()
     update_service = UpdateService.Field()
     update_piece = UpdatePiece.Field() 
+    update_piece_request = UpdatePieceRequest.Field()
+    update_otherpiece_request = UpdateOtherPieceRequest.Field()
     
     delete_user = DeleteUser.Field()
     delete_entry = DeleteEntry.Field()
@@ -90,4 +94,6 @@ class Mutation(ObjectType):
     delete_roadservice = DeleteRoadService.Field()
     delete_service = DeleteService.Field()
     delete_piece = DeletePiece.Field() 
+    delete_piece_request = DeletePieceRequest.Field()
+    delete_otherpiece_request = DeleteOtherPieceRequest.Field()
     
